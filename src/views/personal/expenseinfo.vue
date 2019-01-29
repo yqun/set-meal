@@ -39,8 +39,7 @@ export default {
         .get(`${this.apiHost}/Order/weixin/wxFindOrderDetail.do?token=${this.token}&f_order_id=${expenseId}`)
         .then(res => {
           let {powers, f_order_type} = res.data.order
-          let maxvalue;
-          f_order_type==1?maxvalue = 300:maxvalue=7000
+          const maxvalue = res.data.f_max_power
           if (powers) {
             this.power = []
             // 循环 得到 powers数据
@@ -56,11 +55,11 @@ export default {
               },
               value: {
                 max: maxvalue,
-                tickCount: 4
+                // tickCount: 6
               }
             });
             // draw a column chart
-            chart.line().position('date*value').color('name');
+            chart.line().position('date*value').shape('smooth').color('name');
             const width = chart.get('width')
             chart.changeSize(width - 14)
           }// end if
@@ -83,6 +82,10 @@ export default {
               if (f_electric_wire_temp) this.rests.push({name: '线缆温度',value: f_electric_wire_temp,date: f_time})
               if (f_voltage) this.rests.push({name: '电压',   value: f_voltage,date: f_time})
             })
+            this.rests.sort((a,b) => {
+              return a.value - b.value
+            })
+            const maxValue = this.rests[this.rests.length - 1].value
             chart.source(this.rests, {
               date: {
                 range: [0, 1],
@@ -90,7 +93,7 @@ export default {
                 mask: 'HH:mm'
               },
               value: {
-                max: 300,
+                max: maxValue,
                 tickCount: 4
               }
             });

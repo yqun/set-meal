@@ -99,7 +99,6 @@ export default {
     },
     // 电桩上线
     upLine (id) {
-      console.log(id+'上线')
       this.$http
         .get(`${this.apiHost}charger/weixin/wxOnLineChargers.do?token=${this.token}&id=${id}`)
         .then(res => {
@@ -108,7 +107,6 @@ export default {
     },
     // 电桩下线
     downLine (id) {
-      console.log(id+'下线')
       this.$http
         .get(`${this.apiHost}charger/weixin/wxOffLineChargers.do?token=${this.token}&id=${id}`)
         .then(res => {

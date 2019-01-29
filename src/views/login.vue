@@ -4,12 +4,20 @@
       <!-- 手机登陆 -->
       <x-input title="手机号码"
                name="mobile"
+               type="tel"
                placeholder="请输入手机号码"
                keyboard="number"
                v-model="cellPhone"
                mask="99999999999">
       </x-input>
-      <x-input title="发送验证码" class="weui-vcode" :max='max' v-model="Verification">
+      <x-input title="图片验证码" placeholder="请输入图片验证码" class="weui-vcode" :max='4' v-model="picverification" :show-clear="false">
+        <img slot="right"
+             :src="imagesUrl"
+             alt="" width="100"
+             @click="changeImages()"
+             style="border-radius:10px;display: block;"/>
+      </x-input>
+      <x-input title="手机验证码" placeholder="请输入手机验证码" class="weui-vcode" :max='max' v-model="Verification" style="top: -2px;">
         <x-button slot="right"
                   type="primary"
                   mini
@@ -37,27 +45,43 @@ export default {
       Verification: '', // 输入的验证码
       btnText: '发送验证码', // 发送验证码按钮文本
       disabledBool: false, // 验证码禁用
+      picverification: '', //图片验证码
+      imagesUrl: '', //验证码图片
       toastVal: '', //toast提示信息
       showToast: false, // toast提示框显示隐藏
     }
   },
   created() {
     this.judgeToken();
+    this.changeImages();
   },
   methods: {
+    // 获取图片
+    changeImages () {
+      const f_random = Math.floor(Math.random()*99999999999)
+      this.imagesUrl = `${this.apiHost}member/weixin/wxGetValidateCode.do?token=${this.token}&f_random=${f_random}`
+    },
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
     },
     // 获取验证码
     getVerification() {
-      if (!(/^1[0-9]{10}$/.test(this.cellPhone))) {
-        this.toastVal = '请填写正确的手机号'
+      if (!(/^1[0-9]{10}$/.test(this.cellPhone)) || this.picverification.trim().length !== 4) {
+        this.toastVal = '请填写正确的手机号和验证码'
         this.showToast = true
       } else {
         this.$http
-          .get(`${this.apiHost}member/weixin/generateMobileIdentifiedCode.do?token=${this.token}`)
+          .get(`${this.apiHost}member/weixin/generateMobileIdentifiedCode.do?token=${this.token}&f_phone_num=${this.cellPhone}&f_img_code=${this.picverification}`)
           .then(res => {
+            console.log(res)
+            const {state} = res.data
+            if (state != true) {
+              const {error} = res.data
+              this.toastVal = '图片验证码错误'
+              this.showToast = true
+              return false;
+            }
             // 60秒时间倒计时
             this.btnText = 60;
             this.disabledBool = true;
@@ -69,8 +93,6 @@ export default {
                 this.disabledBool = false
               }
             }, 1000)
-            const {code} = res.data
-            this.Verification = code
           })
       }
     },
@@ -78,12 +100,15 @@ export default {
       if (!(/^1[0-9]{10}$/.test(this.cellPhone))) {
         this.toastVal = '手机号错误'
         this.showToast = true
-      } else if (this.Verification == '' || this.Verification.length !== 6) {
-        this.toastVal = '验证码错误'
+      } else if (this.picverification.trim() == '' || this.picverification.trim().length !== 4) {
+        this.toastVal = '图片验证码错误'
+        this.showToast = true
+      } else if (this.Verification.trim() == '' || this.Verification.trim().length !== 6) {
+        this.toastVal = '手机号验证码错误'
         this.showToast = true
       } else {
         this.$http
-          .get(`${this.apiHost}member/weixin/authenticMember.do?token=${this.token}&f_phone_num=${this.cellPhone}&code=${this.Verification}`)
+          .get(`${this.apiHost}member/weixin/authenticMember.do?token=${this.token}&f_phone_num=${this.cellPhone}&code=${this.Verification}&f_img_code=${this.picverification}`)
           .then(res => {
             const {state} = res.data
             if (state == true) {

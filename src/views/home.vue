@@ -186,7 +186,7 @@ export default {
       pointer_free_count: 0,
       state: false,
       show: false,
-      title: '请选择充电桩',
+      title: '请选择插座',
       // 循环插座
       confirmList: [],
       // 选择的插座
@@ -388,7 +388,7 @@ export default {
       this.chooseconfirmList = this.confirmList[index]
       this.show = false
       this.formData.f_pointer_order = this.confirmList[index].f_order
-        if (this.confirmList[index].f_work_state == 2) {
+      if (this.confirmList[index].f_work_state == 2) {
         this.showPositionValue = true
         this.massage = '该充电口正在使用'
       } else if (this.confirmList[index].f_work_state == 3) {
@@ -401,8 +401,10 @@ export default {
     },
     // 点击确认使用
     showConfirm () {
-      this.handleState();
+      if (this.formData.f_pointer_order && this.formData.f_product_id && this.formData.f_sn_num) return this.affirmcharge();
+      // this.handleState();
       if (this.f_charger_type == 1) {
+        // 电车桩
         if (this.formData.f_pointer_order == undefined) {
           this.formData.f_product_id = this.chooseCost[0].id;
           if (this.confirmList.length == 1) {
@@ -416,6 +418,7 @@ export default {
           this.affirmcharge();
         }
       } else if (this.f_charger_type == 2){
+        // 汽车桩
         this.formData.f_product_id = -1
         if (this.confirmList.length == 1) {
           this.confirmListitem(0);
@@ -446,7 +449,6 @@ export default {
     affirm () {
       this.$http.get(this.apiHost + `charger/weixin/startCharge.do?token=${this.token}&f_sn_num=${this.formData.f_sn_num}&f_product_id=${this.formData.f_product_id}&f_pointer_order=${this.formData.f_pointer_order}`)
         .then(res => {
-          console.log(res)
           const {state} = res.data
           this.massage = '充电已开始'
           if (state == true) {

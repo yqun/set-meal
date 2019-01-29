@@ -9,7 +9,7 @@
               @click="$router.push(`/expenseinfo/${item.id}`)">
             <h3>
               <p>订单金额</p>
-              <i v-if="item.f_order_type == 1 && item.f_state == true" @click="stopcharge(item.id)">停止充电</i>
+              <i v-if="item.f_order_type == 1 && item.f_state == true" @click.stop="stopcharge(item.id)">停止充电</i>
               <span v-else>{{item.f_sum}}</span>
             </h3>
             <div class="contentitem clearfix">
@@ -79,6 +79,7 @@ export default {
     },
     // 停止充电
     stopcharge (id) {
+      console.log(1)
       this.loadingShow = true;
       this.loadingMsg = '正在结束请稍后',
       this.$http

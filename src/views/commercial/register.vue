@@ -4,11 +4,11 @@
     <comm-admin go="/commercial"></comm-admin>
     <!-- 扫一扫 -->
     <group title="注册充电桩" title-color="blue">
-      <x-input class="weui-vcode" v-model="saoma1">
+      <x-input class="weui-vcode" v-model="saoma1" :show-clear="false">
         <x-button slot="right" type="primary" mini @click.native="facility()">扫一扫</x-button>
       </x-input>
       <span>请扫描设备通讯卡上的二维码</span>
-      <x-input class="weui-vcode" v-model="saoma2">
+      <x-input class="weui-vcode" v-model="saoma2" :show-clear="false">
         <x-button slot="right" type="primary" mini @click.native="machine()">扫一扫</x-button>
       </x-input>
     </group>
