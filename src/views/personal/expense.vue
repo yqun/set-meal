@@ -74,17 +74,18 @@ export default {
             item.f_sum = (item.f_sum*1).toFixed(2)
             this.rows.push(item);
           })
+          // console.log(this.rows)
           this.pagesize++
         })
     },
     // 停止充电
     stopcharge (id) {
-      console.log(1)
       this.loadingShow = true;
       this.loadingMsg = '正在结束请稍后',
       this.$http
         .get(`${this.apiHost}/Order/weixin/wxOverOrder.do?token=${this.token}&f_order_id=${id}`)
         .then(res => {
+          console.log(res)
           this.loadingShow = false;
           const {state} = res.data
           if (state == true) {

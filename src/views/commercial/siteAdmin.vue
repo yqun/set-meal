@@ -15,7 +15,7 @@
           <p>
             闲:<i style="color: green">{{item.f_work_state_1}}个</i>
             充:<i style="color: orange">{{item.f_work_state_2}}个</i>
-            禁:<i style="color: red">{{item.f_work_state_4}}个</i>
+            坏:<i style="color: red">{{item.f_work_state_4}}个</i>
           </p>
         </div>
         <div>

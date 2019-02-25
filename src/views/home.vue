@@ -26,7 +26,7 @@
         </div>
       </flexbox-item>
       <flexbox-item>
-        <div class="option" @click="$router.push('/expense')">
+        <div class="option" @click="expense()">
           <i class="iconfont icon-dingdan"></i>
           <p>我的订单</p>
         </div>
@@ -224,6 +224,7 @@ export default {
     async handleToken() {
       // 判断 是扫码进来的主页  还是通过跳转进来的
       this.openId = this.$route.query.openId
+      this.random = this.$route.query.f_random_num
       const res = await this.$http.get(`${this.apiHost}member/getToken.do?openId=${this.openId}`);
       const {data} = res;
       // 判断 token 是否存在
@@ -238,7 +239,6 @@ export default {
     },
     // 获取   f_sn_num设备码
     getf_sn_num() {
-      this.random = this.$route.query.f_random_num
       if (this.random) {
         this.$http.get(`${this.apiHost}charger/weixin/findEntityByRandom.do?token=${this.token}&f_random_num=${this.random}`)
           .then(res => {
@@ -271,10 +271,22 @@ export default {
       this.$http.get(`${this.apiHost}member/weixin/findMemberByToken.do?token=${this.token}`)
         .then(res => {
           const {state} = res.data
-          if (state == false) {
-            this.$router.push('/login');
-          } else {
+          if (state == true) {
             this.$router.push('/personal')
+          } else {
+            this.$router.push('/login?to=personal');
+          }
+        })
+    },
+    // 我的订单
+    expense () {
+      this.$http.get(`${this.apiHost}member/weixin/findMemberByToken.do?token=${this.token}`)
+        .then(res => {
+          const {state} = res.data
+          if (state == true) {
+            this.$router.push('/expense')
+          } else {
+            this.$router.push('/login?to=expense');
           }
         })
     },

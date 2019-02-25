@@ -1,10 +1,5 @@
 <template>
   <div class="bankcard">
-    <!-- 搜索卡 -->
-    <!--<div class="inputcard">-->
-      <!--<input type="text" v-model="bankcard" placeholder="请输入卡名/卡号">-->
-      <!--<icon type="search"></icon>-->
-    <!--</div>-->
     <!-- 添加银行卡 -->
     <div class="card clearfix">
       <div style="float: left">

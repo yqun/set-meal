@@ -120,6 +120,11 @@ export default {
             },
             fail: function (res) {
               that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+            },
+            cancel: function (res) {
+              //支付取消
+              alert('支付取消');
+              that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
             }
           });
         })

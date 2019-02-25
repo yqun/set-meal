@@ -67,6 +67,10 @@ router.beforeEach((to, from, next) => {
       next()
     }
   }
+  // console.log(from)
+  if (to.path === '/expense' || to.path === '/personal') {
+    // console.log(1)
+  }
 })
 
 export default router

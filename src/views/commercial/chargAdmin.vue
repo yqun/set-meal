@@ -1,5 +1,5 @@
 <template>
-  <div class="comm-body" @touchmove.prevent>
+  <div class="comm-body">
     <!-- 返回导航 -->
     <comm-admin go="commercial"></comm-admin>
     <div class="content">

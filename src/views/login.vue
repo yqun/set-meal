@@ -1,32 +1,24 @@
 <template>
   <div class="comm-body" @touchmove.prevent>
+    <!--<img src="../assets/images/bj.jpg" alt="">-->
     <div>
-      <!-- 手机登陆 -->
-      <x-input title="手机号码"
-               name="mobile"
-               type="tel"
-               placeholder="请输入手机号码"
-               keyboard="number"
-               v-model="cellPhone"
-               mask="99999999999">
-      </x-input>
-      <x-input title="图片验证码" placeholder="请输入图片验证码" class="weui-vcode" :max='4' v-model="picverification" :show-clear="false">
-        <img slot="right"
-             :src="imagesUrl"
-             alt="" width="100"
-             @click="changeImages()"
-             style="border-radius:10px;display: block;"/>
-      </x-input>
-      <x-input title="手机验证码" placeholder="请输入手机验证码" class="weui-vcode" :max='max' v-model="Verification" style="top: -2px;">
-        <x-button slot="right"
-                  type="primary"
-                  mini
-                  :disabled="disabledBool"
-                  @click.native="getVerification()">{{btnText}}</x-button>
-      </x-input>
-      <!-- 登录按钮 -->
-      <div class="login">
-        <x-button type="primary" @click.native="getLoginMsg()">确认登陆</x-button>
+      <div class="content" :style="contentstyle" ref="getfocus" @focusin="show()" @focusout="hide()">
+        <!-- 手机登陆 -->
+        <x-input title="手机号码" name="mobile" type="tel" placeholder="请输入手机号码" keyboard="number" v-model="cellPhone" mask="99999999999"></x-input>
+        <x-input title="图片验证码" placeholder="请输入图片验证码" class="weui-vcode" :max='4' v-model="picverification" :show-clear="false">
+          <img slot="right"
+               :src="imagesUrl"
+               alt="" width="100"
+               @click="changeImages()"
+               style="border-radius:10px;display: block;"/>
+        </x-input>
+        <x-input title="手机验证码" placeholder="请输入手机验证码" class="weui-vcode" :max='max' v-model="Verification" style="top: -2px;">
+          <x-button slot="right" type="primary" mini :disabled="disabledBool" @click.native="getVerification()">{{btnText}}</x-button>
+        </x-input>
+        <!-- 登录按钮 -->
+        <div class="login">
+          <x-button type="primary" @click.native="getLoginMsg()">确认登陆</x-button>
+        </div>
       </div>
       <!-- toast信息提示 -->
       <toast v-model="showToast" type="text" :time="800" is-show-mask :text="toastVal" position="middle"></toast>
@@ -49,21 +41,51 @@ export default {
       imagesUrl: '', //验证码图片
       toastVal: '', //toast提示信息
       showToast: false, // toast提示框显示隐藏
+      contentstyle: {
+        bottom: '200px',
+      },
+      oHeight: document.documentElement.clientHeight,
     }
   },
   created() {
+    // console.log(window)
     this.judgeToken();
     this.changeImages();
   },
+  mounted () {
+    // 监听屏幕变化
+    window.onresize = ()=>{
+      if (this.oHeight - document.documentElement.clientHeight > 100) {
+        this.contentstyle.bottom = 0;
+      } else {
+        this.contentstyle.bottom = '200px';
+      }
+    }
+  },
   methods: {
-    // 获取图片
-    changeImages () {
-      const f_random = Math.floor(Math.random()*99999999999)
-      this.imagesUrl = `${this.apiHost}member/weixin/wxGetValidateCode.do?token=${this.token}&f_random=${f_random}`
+    // ios 焦点事件
+    show () {
+      const u = navigator.userAgent, app = navigator.appVersion;
+      const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); // ios终端
+      if (isiOS) {
+        this.contentstyle.bottom = '200px';
+      }
+    },
+    hide() {
+      const u = navigator.userAgent, app = navigator.appVersion;
+      const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); // ios终端
+      if (isiOS) {
+        this.contentstyle.bottom = '200px';
+      }
     },
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
+    },
+    // 获取图片
+    changeImages () {
+      const f_random = Math.floor(Math.random()*99999999999)
+      this.imagesUrl = `${this.apiHost}member/weixin/wxGetValidateCode.do?token=${this.token}&f_random=${f_random}`
     },
     // 获取验证码
     getVerification() {
@@ -74,7 +96,7 @@ export default {
         this.$http
           .get(`${this.apiHost}member/weixin/generateMobileIdentifiedCode.do?token=${this.token}&f_phone_num=${this.cellPhone}&f_img_code=${this.picverification}`)
           .then(res => {
-            console.log(res)
+            // console.log(res)
             const {state} = res.data
             if (state != true) {
               const {error} = res.data
@@ -96,6 +118,7 @@ export default {
           })
       }
     },
+    // 确认登陆
     getLoginMsg() {
       if (!(/^1[0-9]{10}$/.test(this.cellPhone))) {
         this.toastVal = '手机号错误'
@@ -111,8 +134,9 @@ export default {
           .get(`${this.apiHost}member/weixin/authenticMember.do?token=${this.token}&f_phone_num=${this.cellPhone}&code=${this.Verification}&f_img_code=${this.picverification}`)
           .then(res => {
             const {state} = res.data
+            const toAddress = this.$route.query.to
             if (state == true) {
-              this.$router.push('/personal')
+              this.$router.push(`/${toAddress}`)
             } else {
               this.toastVal = res.data.error
               this.showToast = true
@@ -128,13 +152,20 @@ export default {
 .comm-body {
   width: 100%;
   height: 100%;
-  background: url("../assets/images/bj.jpg") center;
+  background-color: black;
+  background:black url("../assets/images/bj.jpg") no-repeat top;
 }
+/*.comm-body > img {*/
+  /*height: 700px;*/
+/*}*/
 .comm-body > div {
   height: 100%;
+  width: 100%;
   background: rgba(0,0,0,0.5);
   box-sizing: border-box;
-  padding: 240px 0 0;
+}
+.content {
+  position: absolute;
 }
 .login {
   width: 100%;

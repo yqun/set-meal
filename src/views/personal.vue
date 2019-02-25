@@ -8,7 +8,7 @@
           <i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>
         </div>
         <div class="userinfo">
-          <span>{{userInfo.f_nick_name || '用户名为空'}}</span>
+          <span>{{userInfo.f_nick_name_real || '用户名为空'}}</span>
           <span>{{userInfo.f_phone_num}}</span>
           <span>账户余额 <strong>{{userInfo.f_remain_sum}}</strong> 元</span>
         </div>
@@ -37,7 +37,7 @@
     </flexbox>
     <group gutter="8px">
       <cell title="附近设备" link="/nearby"></cell>
-      <cell title="消费记录" link="/expense"></cell>
+      <cell title="消费记录" is-link @click.native="expense()"></cell>
       <cell title="商户入口" is-link @click.native="commercial()"></cell>
       <cell title="我的收藏" link=""></cell> <!-- /enshrine -->
       <cell title="更换设备绑定" link="/login"></cell> <!-- /enshrine -->
@@ -86,10 +86,22 @@ export default {
     this.handleToken();
   },
   methods: {
+    // 点击消费记录
+    expense() {
+      this.$http.get(`${this.apiHost}member/weixin/findMemberByToken.do?token=${this.token}`)
+        .then(res => {
+          const {state} = res.data
+          if (state == true) {
+            this.$router.push('/expense')
+          } else {
+            this.$router.push('/login');
+          }
+        })
+    },
     // 点击商户中心
     commercial() {
       this.$http
-        .get(`${this.apiHost}member /weixin/checkAuthen.do?token=${this.token}`)
+        .get(`${this.apiHost}member/weixin/checkAuthen.do?token=${this.token}`)
         .then(res => {
           const {state} = res.data
           if (state == true) {
