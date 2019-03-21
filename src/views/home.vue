@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-bottom: 54px;">
     <!-- banner -->
     <swiper :loop="true"
             :aspect-ratio="swiperHeight"
@@ -103,7 +103,15 @@
       </flexbox-item>
     </flexbox>
     <!-- 信息说明 -->
-    <div class="state">说明: <span></span></div>
+    <div class="state" v-if="f_manufacturer == 1">
+      温馨提示:
+      <span @click="confirmState = true">本设备使用过程中若功率超过设定标准,实际充电时间将缩短，点击本条提示查看标准</span>
+    </div>
+    <confirm v-model="confirmState" title="详细说明" :show-cancel-button="false">
+      <p class="confirmconent">充电功率<250W，100%套餐时长充电</p>
+      <p class="confirmconent">250W≤充电功率<500W，50%套餐时长充电</p>
+      <p class="confirmconent">500W≤充电功率<800W，25%套餐时长充电</p>
+    </confirm>
     <!-- 按钮 -->
     <div class="submit">
       <x-button type="primary" class="btn" @click.native="showConfirm()" :disabled="disabled">确认使用</x-button>
@@ -209,6 +217,9 @@ export default {
       massage1: '充值成功',
       orderId: '',
       disabled: false, // 确认充电按钮禁用
+      // 判断说明信息存在不存在
+      f_manufacturer: 0,
+      confirmState: false,
     }
   },
   created () {
@@ -242,10 +253,12 @@ export default {
       if (this.random) {
         this.$http.get(`${this.apiHost}charger/weixin/findEntityByRandom.do?token=${this.token}&f_random_num=${this.random}`)
           .then(res => {
+            // console.log(res)
             const { state } = res.data
             if (state == true) {
-              const {f_sn_num} = res.data.charge
+              const {f_sn_num, f_manufacturer} = res.data.charge
               this.sn_num = f_sn_num
+              this.f_manufacturer = f_manufacturer
               window.sessionStorage.setItem('sn_num', this.sn_num);
               this.formData.f_sn_num = this.sn_num
               //根据设备号获取设备信息
@@ -329,6 +342,13 @@ export default {
               } else {
                 // alert('获取随机数成功' + res.resultStr.split('=')[1])
                 that.random = res.resultStr.split('=')[1]
+                that.$router.push({
+                  path: '/home',
+                  query: {
+                    f_random: res.resultStr.split('=')[1],
+                    openId: that.openId
+                  }
+                })
                 that.getf_sn_num()
               }
             }
@@ -363,7 +383,7 @@ export default {
             this.confirmList = pointers; // 插头
           } else {
             this.showPositionValue1 = true
-            this.massage1 = '改充电桩已下线'
+            this.massage1 = '该充电桩已下线'
           }
           this.handleCost() // 获取充电套餐
         })
@@ -372,7 +392,7 @@ export default {
     handleCost () {
       // 判断 f_charger_type 值 汽车桩没有套餐
       if (this.f_charger_type == 1) {
-        this.$http.get(this.apiHost + `product/findProductByCondition.do?token=${this.token}&f_product_type=1&f_charger_type=${this.f_charger_type}`)
+        this.$http.get(this.apiHost + `product/findProductByCondition.do?token=${this.token}&f_product_type=1&f_charger_type=${this.f_charger_type}&f_sn_num=${this.sn_num}`)
           .then(res => {
             const {rows} = res.data
             this.chooseCost = rows // 套餐
@@ -509,7 +529,7 @@ export default {
         .catch(err => {
           alert(err)
         })
-    }
+    },
 
   }
 }
@@ -603,25 +623,36 @@ p.scan i{
 }
 /* 说明  按钮 */
 div.state {
-  height: 40px;
-  line-height: 40px;
   background-color: #f3f8fe;
-  margin: 10px 10px 66px;
+  margin: 10px 10px;
   padding: 0 10px;
   box-sizing: border-box;
+}
+div.state > span {
+  font-size: 14px;
+  color: #ff7272;
+}
+/* 弹窗说明内容 */
+.confirmconent {
+  font-size: 14px;
+  text-align: left;
+  margin-top: 10px;
+  color: #333;
 }
 .submit {
   box-sizing: border-box;
   padding: 5px 10px;
-  background-color: #fff;
+  background-color: transparent;
   position: fixed;
   z-index:10000;
   bottom: 0;
   left: 0;
   width: 100%;
 }
-.btn {
+.submit button.btn.weui-btn_primary {
   margin-top: 14px;
+  background-color: rgba(25,173,26,0.5);
+  font-weight: 700;
 }
 /* tab */
 .vux-button-group {

@@ -3,7 +3,6 @@ import axios from 'axios'
 import queryString from 'querystring'
 
 const urlStr = 'http://10.1.9.34:1444/platform/'
-
 const HttpTool = axios.create({
   baseURL: urlStr,
   timeout: 15000,
