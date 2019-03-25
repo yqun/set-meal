@@ -17,7 +17,7 @@
         <li class="clearfix">
           <span>充电 <strong style="color: orange">{{f_order_count || 0}}</strong> 次</span>
           <span>总消费 <strong style="color: green">{{f_sum}}</strong> 元</span>
-          <span>耗电 <strong style="color: orange">0</strong> 度</span>
+          <span>耗电 <strong style="color: orange">{{f_kwh}}</strong> 度</span>
         </li>
         <li class="clearfix">
           <div>日期</div>
@@ -42,11 +42,11 @@
           </div>
           <div>
             <span>{{item.minute}}</span>
-            <span>0</span>
+            <span>{{(item.power*1).toFixed(2)}}</span>
           </div>
           <div>
             <span>{{item.sum}}</span>
-            <span>0</span>
+            <span>{{(item.kwh*1).toFixed(2)}}</span>
           </div>
         </li>
       </ul>
@@ -69,6 +69,7 @@ export default {
       pagesize: 1, // 站点数据分页
       f_order_count: 0, // 总的充电次数
       f_sum: 0, // 总的消费额度
+      f_kwh: 0,
       dayinfo: [], // 日报信息
       ratio: 0, // 判断 数据是否还有
     }
@@ -103,10 +104,12 @@ export default {
       this.$http
         .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&page=${this.pagesizeAll}&rows=10`)
         .then(res => {
-          const {f_order_count, f_sum, state, rows, total} = res.data
+          console.log(res)
+          const {f_order_count, f_sum, state, rows, total,f_kwh} = res.data
           if (rows.length > 0) {
             this.f_order_count = f_order_count
             this.f_sum = (f_sum*1).toFixed(2)
+            this.f_kwh = (f_kwh*1).toFixed(2)
             // 判断数据是否还有
             this.ratio = Math.ceil(total / 10)
             rows.forEach(item => {

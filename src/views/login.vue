@@ -190,4 +190,7 @@ div.vux-x-input.weui-cell.weui-vcode::after {
   transform: scaleY(0.5);
   left: 15px;
 }
+.vux-x-input.weui-cell /deep/ .weui-cell__bd {
+  font-size: 18px;
+}
 </style>

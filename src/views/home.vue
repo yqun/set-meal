@@ -15,31 +15,36 @@
     <flexbox :gutter="0">
       <flexbox-item>
         <div class="option" @click="personal()">
-          <i class="iconfont icon-icon7"></i>
+          <!--<i class="iconfont icon-icon7"></i>-->
+          <img src="../assets/images/充电桩_03.png" alt="">
           <p>个人中心</p>
         </div>
       </flexbox-item>
       <flexbox-item>
         <div class="option" @click="$router.push('/recharge')">
-          <i class="iconfont icon-chongzhi"></i>
+          <!--<i class="iconfont icon-chongzhi"></i>-->
+          <img src="../assets/images/充电桩_05.png" alt="">
           <p>充值中心</p>
         </div>
       </flexbox-item>
       <flexbox-item>
         <div class="option" @click="expense()">
-          <i class="iconfont icon-dingdan"></i>
+          <!--<i class="iconfont icon-dingdan"></i>-->
+          <img src="../assets/images/充电桩_07.png" alt="">
           <p>我的订单</p>
         </div>
       </flexbox-item>
       <flexbox-item>
         <div class="option">
-          <i class="iconfont icon-xin"></i>
+          <!--<i class="iconfont icon-xin"></i>-->
+          <img src="../assets/images/充电桩_09.png" alt="">
           <p>公众号</p>
         </div>
       </flexbox-item>
       <flexbox-item>
         <div class="option">
-          <i class="iconfont icon-handshakedealp"></i>
+          <!--<i class="iconfont icon-handshakedealp"></i>-->
+          <img src="../assets/images/充电桩_11.png" alt="">
           <p>投资加盟</p>
         </div>
       </flexbox-item>    </flexbox>
@@ -93,19 +98,64 @@
       <flexbox-item>
         <button-tab v-model="index">
           <button-tab-item class="mealchoose-item"
-                           @on-item-click="getActivebtn()"
-                            v-for="(item,index) in chooseCost"
-                            :key="item.id">
+                           @on-item-click="getActivebtn(index)"
+                           v-if="item.f_product_type != 3"
+                           v-for="(item,index) in chooseCost"
+                           :key="item.id">
             <p>{{item.f_sum}}元</p>
             <strong>使用{{item.f_minute}}分钟</strong>
+          </button-tab-item>
+          <button-tab-item class="mealchoose-item"
+                           @on-item-click="getActivebtn(index)"
+                           style="height: 38px;line-height: 38px;background-color: green;"
+                           v-if="item.f_product_type == 3"
+                           v-for="(item,index) in chooseCost"
+                           :key="item.id">
+            <p style="color:#fff;font-size: 18px;">充满自停</p>
+            <strong></strong>
           </button-tab-item>
         </button-tab>
       </flexbox-item>
     </flexbox>
     <!-- 信息说明 -->
     <div class="state" v-if="f_manufacturer == 1">
-      温馨提示:
-      <span @click="confirmState = true">本设备使用过程中若功率超过设定标准,实际充电时间将缩短，点击本条提示查看标准</span>
+      <div v-if="!fullStop.length">
+        温馨提示:
+        <span @click="confirmState = true">
+        本设备使用过程中若功率超过设定标准,实际充电时间将缩短，点击本条提示查看标准
+      </span>
+      </div>
+      <div v-if="fullStop.length">
+        充电服务费(按分钟计费)
+        <flexbox style="margin-top: 10px;">
+          <flexbox-item>
+            <div class="full-stop">
+              <p>0 < 功率(瓦) ≤ {{fullStop[0].f_level_one}}</p>
+              <p>{{fullStop[0].f_price_one}}元/小时</p>
+            </div>
+          </flexbox-item>
+          <flexbox-item>
+            <div class="full-stop">
+              <p>{{fullStop[0].f_level_one}} < 功率(瓦) ≤ {{fullStop[0].f_level_second}}</p>
+              <p>{{fullStop[0].f_price_second}}元/小时</p>
+            </div>
+          </flexbox-item>
+        </flexbox>
+        <flexbox style="margin-top: 10px;">
+          <flexbox-item>
+            <div class="full-stop">
+              <p>{{fullStop[0].f_level_second}} < 功率(瓦) ≤ {{fullStop[0].f_level_third}}</p>
+              <p>{{fullStop[0].f_price_third}}元/小时</p>
+            </div>
+          </flexbox-item>
+          <flexbox-item>
+            <div class="full-stop">
+              <p>{{fullStop[0].f_level_third}} < 功率(瓦) ≤ {{fullStop[0].f_level_fourth}}</p>
+              <p>{{fullStop[0].f_price_fourth}}元/小时</p>
+            </div>
+          </flexbox-item>
+        </flexbox>
+      </div>
     </div>
     <confirm v-model="confirmState" title="详细说明" :show-cancel-button="false">
       <p class="confirmconent">充电功率<250W，100%套餐时长充电</p>
@@ -189,7 +239,7 @@ export default {
       // 静态图片充电桩
       imageUrl: '',
       // tabButton
-      index: 0,
+      index: -1,
       signal: 0,
       pointer_free_count: 0,
       state: false,
@@ -220,6 +270,7 @@ export default {
       // 判断说明信息存在不存在
       f_manufacturer: 0,
       confirmState: false,
+      fullStop: [], // 充满自停
     }
   },
   created () {
@@ -264,6 +315,7 @@ export default {
               //根据设备号获取设备信息
               this.handleState();
             } else {
+              console.log(1)
               const {error} = res.data
               alert(error)
             }
@@ -381,9 +433,6 @@ export default {
             this.pointer_free_count = f_pointer_free_count; // 可用插座数
             this.signal = f_signal; // 信号
             this.confirmList = pointers; // 插头
-          } else {
-            this.showPositionValue1 = true
-            this.massage1 = '该充电桩已下线'
           }
           this.handleCost() // 获取充电套餐
         })
@@ -394,13 +443,16 @@ export default {
       if (this.f_charger_type == 1) {
         this.$http.get(this.apiHost + `product/findProductByCondition.do?token=${this.token}&f_product_type=1&f_charger_type=${this.f_charger_type}&f_sn_num=${this.sn_num}`)
           .then(res => {
+            console.log(res)
             const {rows} = res.data
             this.chooseCost = rows // 套餐
           })
       }
     },
     // 点击按钮选择套餐
-    getActivebtn () {
+    getActivebtn (index) {
+      console.log(index)
+      // console.log(id)
       this.handleState();
       if (this.sn_num) {
         if (this.confirmList.length == 1) {
@@ -408,14 +460,17 @@ export default {
         } else {
           this.show = true;
         }
-        this.formData.f_product_id = this.chooseCost[this.index].id
+        this.formData.f_product_id = this.chooseCost[index].id
       } else {
         this.show = true;
         this.title = '请重新扫描二维码'
       }
-
+      // 判断充满自停
+      this.fullStop = this.chooseCost.filter((item) => {
+        return item.id == this.chooseCost[index].id && item.f_product_type == 3
+      })
     },
-    // 点击弹框列表选项
+    // 点击选择插座
     confirmListitem(index) {
       this.chooseconfirmList = this.confirmList[index]
       this.show = false
@@ -430,27 +485,38 @@ export default {
         this.showPositionValue = true
         this.massage = '该充电口故障'
       }
+
+      // this.showConfirm()
     },
     // 点击确认使用
     showConfirm () {
-      if (this.formData.f_pointer_order && this.formData.f_product_id && this.formData.f_sn_num) return this.affirmcharge();
+      // 汽车桩跳到电车桩
+      if(this.f_charger_type != 2 && this.formData.f_product_id == -1) {
+        this.formData.f_pointer_order = undefined
+      }
+      if (this.f_charger_type != 2 && this.formData.f_pointer_order && this.formData.f_product_id && this.formData.f_sn_num) return this.affirmcharge();
       // this.handleState();
       if (this.f_charger_type == 1) {
-        // 电车桩
-        if (this.formData.f_pointer_order == undefined) {
-          this.formData.f_product_id = this.chooseCost[0].id;
-          if (this.confirmList.length == 1) {
-            this.confirmListitem(0);
-            this.affirmcharge();
-          } else {
-            this.show = true;
+          // 电车桩
+          if (this.index == -1) {
+            this.showPositionValue = true
+            return this.massage = '请选择套餐'
           }
-          // this.formData.f_product_id = this.chooseCost[0].id;
-        } else {
-          this.affirmcharge();
-        }
-      } else if (this.f_charger_type == 2){
-        // 汽车桩
+          if (this.formData.f_pointer_order == undefined) {
+            this.show = true
+            this.showPositionValue = true
+            return this.massage = '请选择插座'
+            // this.formData.f_product_id = this.chooseCost[this.index].id;
+            // if (this.confirmList.length == 1) {
+            //   this.confirmListitem(0);
+            //   this.affirmcharge();
+            // } else {
+            //   this.show = true;
+            // }
+          }
+      }
+      // 汽车桩
+      if (this.f_charger_type == 2){
         this.formData.f_product_id = -1
         if (this.confirmList.length == 1) {
           this.confirmListitem(0);
@@ -462,8 +528,10 @@ export default {
     },
     // 确认充电 判断金额是否小于套餐金额
     affirmcharge() {
+      // alert('判断')
       this.$http.get(`${this.apiHost}member/checkEnough.do?token=${this.token}&id=${this.formData.f_product_id}`)
         .then((res) => {
+          // console.log('余额不足')
           const {state} = res.data
           if (state == true) {
             if (this.state === false) {
@@ -493,6 +561,7 @@ export default {
         })
     },
     addmonery () {
+      if (this.formData.f_product_id == -1) return this.$router.push('recharge');
       // 跳转地址
       this.$http.get(this.apiHost + `weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.formData.f_product_id}`)
         .then(res => {
@@ -549,6 +618,10 @@ ul>li {
   text-align: center;
   padding-top: 20px;
 }
+.option img {
+  width: 60%;
+  vertical-align: middle;
+}
 .option i {
   font-size: 26px;
   padding: 10px;
@@ -560,7 +633,7 @@ ul>li {
 }
 .option p {
   font-size: 14px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 /* 新起点嘉园 */
 .content {
@@ -628,9 +701,16 @@ div.state {
   padding: 0 10px;
   box-sizing: border-box;
 }
-div.state > span {
+div.state  span {
   font-size: 14px;
   color: #ff7272;
+}
+div.state .full-stop {
+  text-align: center;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-clip: padding-box;
 }
 /* 弹窗说明内容 */
 .confirmconent {
@@ -659,6 +739,7 @@ div.state > span {
   flex-wrap: wrap;
 }
 .vux-button-group a {
+  min-width: 70px;
   line-height: normal;
   padding: 18px 0;
   border-radius: 5px !important;

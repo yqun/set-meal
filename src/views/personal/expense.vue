@@ -50,6 +50,7 @@ export default {
       toastShow: false,
       loadingShow: false,
       loadingMsg: '',
+      flag: true, // 控制页面按钮只可以点一次
     }
   },
   created () {
@@ -80,13 +81,16 @@ export default {
     },
     // 停止充电
     stopcharge (id) {
+      if(!this.flag) return false;
+      this.flag = false;
       this.loadingShow = true;
       this.loadingMsg = '正在结束请稍后',
       this.$http
         .get(`${this.apiHost}/Order/weixin/wxOverOrder.do?token=${this.token}&f_order_id=${id}`)
         .then(res => {
-          console.log(res)
+          // console.log(res)
           this.loadingShow = false;
+          this.flag = true;
           const {state} = res.data
           if (state == true) {
             this.pagesize = 1
