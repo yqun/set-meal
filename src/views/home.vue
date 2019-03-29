@@ -122,8 +122,8 @@
       <div v-if="!fullStop.length">
         温馨提示:
         <span @click="confirmState = true">
-        本设备使用过程中若功率超过设定标准,实际充电时间将缩短，点击本条提示查看标准
-      </span>
+          本设备使用过程中若功率超过设定标准,实际充电时间将缩短，点击本条提示查看标准
+        </span>
       </div>
       <div v-if="fullStop.length">
         充电服务费(按分钟计费)
@@ -168,15 +168,14 @@
       <confirm v-model="toastShow" class="confirm" @on-confirm="affirm()">
         <h2>请把插头插在插座上</h2>
       </confirm>
+      <!-- toast -->
       <toast v-model="showPositionValue" type="text" :time="1000" :text="massage" position="middle" width="10em"></toast>
-      <!-- 充钱 -->
-      <toast v-model="showPositionValue1" type="text" :time="1000" :text="massage1" position="middle"></toast>
     </div>
     <!-- 验证钱包 -->
     <confirm v-model="toastShowMonery" class="confirm" confirm-text="去充钱" @on-confirm="addmonery()">
       <h2>{{content}}</h2>
     </confirm>
-    <!-- 弹框 -->
+    <!-- 插座弹框 -->
     <confirm :title="title" v-model="show" class="confirm" :show-confirm-button="false">
       <ul class="clearfix">
         <li v-if="state === false" style="width: 100%; color: #333;"><h2>该充电桩已下线</h2></li>
@@ -261,10 +260,8 @@ export default {
       toastShowMonery: false,
       // 充电
       showPositionValue: false,
-      showPositionValue1: false,
       // error
       massage: '充电已开始',
-      massage1: '充值成功',
       orderId: '',
       disabled: false, // 确认充电按钮禁用
       // 判断说明信息存在不存在
@@ -451,8 +448,6 @@ export default {
     },
     // 点击按钮选择套餐
     getActivebtn (index) {
-      console.log(index)
-      // console.log(id)
       this.handleState();
       if (this.sn_num) {
         if (this.confirmList.length == 1) {
@@ -485,8 +480,6 @@ export default {
         this.showPositionValue = true
         this.massage = '该充电口故障'
       }
-
-      // this.showConfirm()
     },
     // 点击确认使用
     showConfirm () {
@@ -496,8 +489,8 @@ export default {
       }
       if (this.f_charger_type != 2 && this.formData.f_pointer_order && this.formData.f_product_id && this.formData.f_sn_num) return this.affirmcharge();
       // this.handleState();
+      // 电车桩
       if (this.f_charger_type == 1) {
-          // 电车桩
           if (this.index == -1) {
             this.showPositionValue = true
             return this.massage = '请选择套餐'
@@ -531,7 +524,6 @@ export default {
       // alert('判断')
       this.$http.get(`${this.apiHost}member/checkEnough.do?token=${this.token}&id=${this.formData.f_product_id}`)
         .then((res) => {
-          // console.log('余额不足')
           const {state} = res.data
           if (state == true) {
             if (this.state === false) {
@@ -550,13 +542,13 @@ export default {
       this.$http.get(this.apiHost + `charger/weixin/startCharge.do?token=${this.token}&f_sn_num=${this.formData.f_sn_num}&f_product_id=${this.formData.f_product_id}&f_pointer_order=${this.formData.f_pointer_order}`)
         .then(res => {
           const {state} = res.data
-          this.massage = '充电已开始'
           if (state == true) {
             this.showPositionValue = true;
+            this.massage = '充电已开始'
           } else {
             const {error} = res.data
-            this.massage = error
             this.showPositionValue = true
+            this.massage = error
           }
         })
     },
