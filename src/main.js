@@ -28,11 +28,12 @@ import { Scroller, LoadMore  } from 'vux'
 import { XInput } from 'vux'
 import { XTable } from 'vux'
 import { Loading } from 'vux'
-
+import { Datetime } from 'vux'
 
 // 导入css
 import './assets/font/iconfont.css'
 import './assets/font01/iconfont.css'
+import './assets/css/commont.css'
 
 Vue.use(HttpTool)
 Vue.use(AjaxPlugin)
@@ -65,7 +66,7 @@ Vue.component('commAdmin', commAdmin ) // 自定义全局组件
 Vue.component('x-input', XInput)
 Vue.component('x-table', XTable)
 Vue.component('loading', Loading)
-
+Vue.component('datetime', Datetime)
 
 new Vue({
   el: '#app',

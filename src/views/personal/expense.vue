@@ -108,31 +108,36 @@ export default {
 </script>
 
 <style scoped>
-.clearfix::before, .clearfix::after {
-  content:"";
-  display: table;
-  overflow: hidden;
-  height: 0;
+h2 {
+  height: 40px;
+  line-height: 40px;
+  font-weight: 400;
+  font-size: 16px;
+  color: #39bafc;
+  padding: 0 20px;
+  position: relative;
 }
-.clearfix::after {
-  clear: both;
+h2::before {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 16px;
+  background-color: #39bafc;
+  position: absolute;
+  top: 12px;
+  left: 10px;
+}
+ul {
+  box-sizing: border-box;
+  padding: 0 10px;
 }
 ul > li {
   list-style: none;
-  padding-bottom: 5px;
-}
-ul {
-  width: 100%;
-}
-ul>li {
-  margin:0 20px;
   background-color: #fff;
-  border-bottom: 1px solid #efefef;
-}
-h2 {
-  background-color: #eee;
-  padding: 0 10px;
-  border-bottom: 2px double black;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: 0px 0px 4px 0px rgba(207,227,228,1);
 }
 ul > li > h3 {
   line-height: 32px;
@@ -145,6 +150,7 @@ ul > li > h3 p {
   float: left;
 }
 ul > li > h3 span {
+  color: orange;
   float: right;
 }
 ul > li > h3 i {

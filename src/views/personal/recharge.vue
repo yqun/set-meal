@@ -3,15 +3,15 @@
   <div>
     <!-- banner -->
     <div class="banner">
-      <a href="javascript:;">
-        <img src="../../assets/images/rechargebanner.jpg" alt="">
-      </a>
+      <span class="back" @click="$router.go(-1)">
+        <x-icon type="ios-arrow-left" size="29" fill="#fff" style="vertical-align: bottom"></x-icon>返回
+      </span>
+      <p>当前余额</p>
+      <p><strong><span>￥</span>{{userInfo.f_remain_sum}}</strong></p>
+      <p>当前账号: {{userInfo.f_nick_name_real}}</p>
     </div>
     <!-- 内容 -->
     <div class="content">
-      <div class="userinfo">
-        当前账号: <span>{{userInfo.f_phone_num}}</span> <span>(余额 ￥{{userInfo.f_remain_sum}})</span>
-      </div>
       <!-- 套餐 -->
       <h3>套餐选择</h3>
       <button-tab v-model="index">
@@ -27,8 +27,11 @@
       <p class="state">充值说明：充值金额可以直接在平台消费抵用</p>
       <!-- 立即充值 -->
       <div>
-        <x-button type="primary" class="btn" @click.native="nowrecharge()">立即充值</x-button>
-        <x-button link="/rechargeorder"><i class="iconfont icon-chongzhijilu"></i>充值记录</x-button>
+        <x-button type="primary" class="btn" @click.native="nowrecharge()" style="background-color: #39bafc;">立即充值</x-button>
+        <x-button link="/rechargeorder" style="background-color: #f8f8fa;">
+          <!--<i class="iconfont icon-chongzhijilu" ></i>-->
+          充值记录
+        </x-button>
       </div>
     </div>
     <!-- 弹出信息 -->
@@ -140,23 +143,31 @@ export default {
 .banner {
   width: 100%;
   height: 200px;
-}
-.banner a {
-  display: block;
-  width: 100%;
-  height: 200px;
-}
-.banner a img {
-  height: 200px;
-  width: 100%;
-}
-.userinfo {
   text-align: center;
+  color: #fff;
+  box-sizing: border-box;
+  padding-top: 40px;
+  background: -webkit-linear-gradient(#38d6fd, #39adf6); /* Safari 5.1 - 6.0 */
+  background: -o-linear-gradient(#38d6fd, #39adf6); /* Opera 11.1 - 12.0 */
+  background: -moz-linear-gradient(#38d6fd, #39adf6); /* Firefox 3.6 - 15 */
+  background: linear-gradient(#38d6fd, #39adf6); /* 标准的语法 */
+  position: relative;
+}
+.banner strong {
+  font-size: 48px;
+}
+.banner strong span {
+  font-size: 30px;
+}
+.banner .back {
+  font-size: 20px;
+  position: absolute;
+  left: 12px;
+  top: 12px;
 }
 h3 {
   padding: 10px 10px;
   margin: 0 10px;
-  border-top: 1px solid #ccc;
   font-weight: 400;
   position: relative;
 }
@@ -194,52 +205,57 @@ h3:before {
   padding: 18px 0;
   border-radius: 5px !important;
   height: 100%;
+  box-sizing: border-box;
   background-color: transparent;
-  border: 1px solid #ccc;
+  border: 1px solid #39bafc;
   margin: 5px 5px;
-  color: #333;
+  color: #666;
 }
 .vux-button-group > a.vux-button-tab-item:after {
   position: relative !important;
   border: none;
 }
 .vux-button-group > a.vux-button-group-current {
-  color: #333;
-  border: 1px solid #01AAED;
-  background-color: rgba(200,225,252,0.1);
+  background: -webkit-linear-gradient(#38d6fd, #39adf6); /* Safari 5.1 - 6.0 */
+  background: -o-linear-gradient(#38d6fd, #39adf6); /* Opera 11.1 - 12.0 */
+  background: -moz-linear-gradient(#38d6fd, #39adf6); /* Firefox 3.6 - 15 */
+  background: linear-gradient(#38d6fd, #39adf6); /* 标准的语法 */
 }
-.vux-button-group > a.vux-button-group-current p:after {
-  content:'';
-  width: 0px;
-  height: 0px;
-  border-radius: 0;
-  border-bottom: 15px solid transparent;
-  border-top: 15px solid #01AAED;;
-  border-right: 15px solid transparent;
-  border-left: 15px solid transparent;
-  transform:rotate(-45deg);
-  position: absolute;
-  right: -15px;
-  bottom: -15px;
+.vux-button-group > a.vux-button-group-current strong {
+  color: #fff;
 }
-.vux-button-group > a.vux-button-group-current strong:after,
-.vux-button-group > a.vux-button-group-current strong:before{
-  display: block;
-  position: absolute;
-  right: 4px;
-  bottom: 0;
-  content: '';
-  width: 1px;
-  height: 12px;
-  background-color: #fff;
-  transform: rotate(40deg);
-}
-.vux-button-group > a.vux-button-group-current strong:before {
-  transform: rotate(-45deg);
-  height: 6px;
-  right: 10px;
-  bottom: 1px;
-}
+/*.vux-button-group > a.vux-button-group-current p:after {*/
+  /*content:'';*/
+  /*width: 0px;*/
+  /*height: 0px;*/
+  /*border-radius: 0;*/
+  /*border-bottom: 15px solid transparent;*/
+  /*border-top: 15px solid #01AAED;;*/
+  /*border-right: 15px solid transparent;*/
+  /*border-left: 15px solid transparent;*/
+  /*transform:rotate(-45deg);*/
+  /*position: absolute;*/
+  /*right: -15px;*/
+  /*bottom: -15px;*/
+/*}*/
+/*.vux-button-group > a.vux-button-group-current strong:after,*/
+/*.vux-button-group > a.vux-button-group-current strong:before{*/
+  /*display: block;*/
+  /*position: absolute;*/
+  /*right: 4px;*/
+  /*bottom: 0;*/
+  /*content: '';*/
+  /*width: 1px;*/
+  /*height: 12px;*/
+  /*background-color: #fff;*/
+  /*transform: rotate(40deg);*/
+/*}*/
+/*.vux-button-group > a.vux-button-group-current strong:before {*/
+  /*transform: rotate(-45deg);*/
+  /*height: 6px;*/
+  /*right: 10px;*/
+  /*bottom: 1px;*/
+/*}*/
 .mealchoose-item span {
   display: block;
   position: absolute;
@@ -259,7 +275,6 @@ h3:before {
 }
 .mealchoose-item strong {
   font-size: 18px;
-  font-weight: 500;
-  color: #FFB800;
+  font-weight: 400;
 }
 </style>

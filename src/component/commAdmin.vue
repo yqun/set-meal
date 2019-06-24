@@ -1,6 +1,7 @@
 <template>
   <div class="comm-header">
     <i @click="$router.push(go)" class="iconfont icon-jiantouarrowhead7"></i>
+    <slot></slot>
   </div>
 </template>
 

@@ -14,40 +14,23 @@
     <!-- flexbox -->
     <flexbox :gutter="0">
       <flexbox-item>
-        <div class="option" @click="personal()">
-          <!--<i class="iconfont icon-icon7"></i>-->
-          <img src="../assets/images/充电桩_03.png" alt="">
-          <p>个人中心</p>
-        </div>
+        <div class="option" @click="personal()"><img src="../assets/images/充电桩_03.png" alt=""><p>个人中心</p></div>
       </flexbox-item>
       <flexbox-item>
         <div class="option" @click="$router.push('/recharge')">
-          <!--<i class="iconfont icon-chongzhi"></i>-->
-          <img src="../assets/images/充电桩_05.png" alt="">
-          <p>充值中心</p>
+          <img src="../assets/images/充电桩_05.png" alt=""><p>充值中心</p>
         </div>
       </flexbox-item>
       <flexbox-item>
-        <div class="option" @click="expense()">
-          <!--<i class="iconfont icon-dingdan"></i>-->
-          <img src="../assets/images/充电桩_07.png" alt="">
-          <p>我的订单</p>
-        </div>
+        <div class="option" @click="expense()"><img src="../assets/images/充电桩_07.png" alt=""><p>我的订单</p></div>
       </flexbox-item>
       <flexbox-item>
-        <div class="option">
-          <!--<i class="iconfont icon-xin"></i>-->
-          <img src="../assets/images/充电桩_09.png" alt="">
-          <p>公众号</p>
-        </div>
+        <div class="option"><img src="../assets/images/充电桩_09.png" alt=""><p>公众号</p></div>
       </flexbox-item>
       <flexbox-item>
-        <div class="option">
-          <!--<i class="iconfont icon-handshakedealp"></i>-->
-          <img src="../assets/images/充电桩_11.png" alt="">
-          <p>投资加盟</p>
-        </div>
-      </flexbox-item>    </flexbox>
+        <div class="option"><img src="../assets/images/充电桩_11.png" alt=""><p>投资加盟</p></div>
+      </flexbox-item>
+    </flexbox>
     <!-- 新起点嘉园 -->
     <div class="content">
       <flexbox>
@@ -58,9 +41,7 @@
         </flexbox-item>
         <flexbox-item>
           <div class="content-txt">
-            <span>
-              编号:{{ sn_num }}
-            </span>
+            <span>编号:{{ sn_num }}</span>
             <span>
               当前信号:
               <strong v-if="this.signal == 5 || this.signal == 4" style="color:green">
@@ -84,10 +65,7 @@
               <strong v-if="chooseconfirmList.f_order == null">未选择</strong>
               <strong v-else-if="chooseconfirmList.f_order !== null">{{chooseconfirmList.f_order}}</strong>
             </p>
-            <p class="scan" @click="againscan()">
-              <i class="iconfont icon-saoyisao"></i>
-              扫一扫
-            </p>
+            <p class="scan" @click="againscan()"><i class="iconfont icon-saoyisao"></i>扫一扫</p>
           </div>
         </flexbox-item>
       </flexbox>
@@ -312,7 +290,7 @@ export default {
               //根据设备号获取设备信息
               this.handleState();
             } else {
-              console.log(1)
+              // console.log(1)
               const {error} = res.data
               alert(error)
             }
@@ -423,6 +401,7 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/findChargerState.do?token=${this.token}&f_sn_num=${this.sn_num}`)
         .then(res => {
+          // console.log(1,res)
           const {f_pointer_free_count, f_signal, pointers, f_state, f_charger_type} = res.data.charger
           this.f_charger_type = f_charger_type
           this.state = f_state;
@@ -438,7 +417,7 @@ export default {
     handleCost () {
       // 判断 f_charger_type 值 汽车桩没有套餐
       if (this.f_charger_type == 1) {
-        this.$http.get(this.apiHost + `product/findProductByCondition.do?token=${this.token}&f_product_type=1&f_charger_type=${this.f_charger_type}&f_sn_num=${this.sn_num}`)
+        this.$http.get(`${this.apiHost}product/findProductByCondition.do?token=${this.token}&f_product_type=1&f_charger_type=${this.f_charger_type}&f_sn_num=${this.sn_num}`)
           .then(res => {
             console.log(res)
             const {rows} = res.data

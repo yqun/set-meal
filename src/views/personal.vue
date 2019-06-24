@@ -1,19 +1,36 @@
 <template>
   <div>
-    <!-- 头像 -->
-    <div class="user" >
-      <div class="center clearfix">
-        <div class="userheader">
-          <img :src="url" v-if="this.url != '0'">
-          <i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>
-        </div>
-        <div class="userinfo">
-          <span>{{userInfo.f_nick_name_real || '用户名为空'}}</span>
-          <span>{{userInfo.f_phone_num}}</span>
-          <span>账户余额 <strong>{{userInfo.f_remain_sum}}</strong> 元</span>
-        </div>
+    <div class="banner">
+      <span class="back" @click="$router.go(-1)">
+        <x-icon type="ios-arrow-left" size="29" fill="#fff" style="vertical-align: bottom"></x-icon>返回
+      </span>
+      <div class="user_header">
+        <img :src="url" v-if="this.url != '0'">
+        <i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>
+      </div>
+      <div>
+        {{userInfo.f_phone_num}}
       </div>
     </div>
+    <div class="wallet">
+      <div>
+
+      </div>
+    </div>
+    <!-- 头像 -->
+    <!--<div class="user" >-->
+      <!--<div class="center clearfix">-->
+        <!--<div class="userheader">-->
+          <!--<img :src="url" v-if="this.url != '0'">-->
+          <!--<i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>-->
+        <!--</div>-->
+        <!--<div class="userinfo">-->
+          <!--<span>{{userInfo.f_nick_name_real || '用户名为空'}}</span>-->
+          <!--<span>{{userInfo.f_phone_num}}</span>-->
+          <!--<span>账户余额 <strong>{{userInfo.f_remain_sum}}</strong> 元</span>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
     <!-- 选项 -->
     <flexbox>
       <flexbox-item class="optionitem">
@@ -40,7 +57,7 @@
       <cell title="消费记录" is-link @click.native="expense()"></cell>
       <cell title="商户入口" is-link @click.native="commercial()"></cell>
       <cell title="我的收藏" link=""></cell> <!-- /enshrine -->
-      <cell title="更换设备绑定" link="/login"></cell> <!-- /enshrine -->
+      <cell title="更换绑定手机号" link="/login"></cell> <!-- /enshrine -->
       <cell title="投资加盟"></cell>
     </group>
     <group title="">
@@ -165,49 +182,49 @@ export default {
 </script>
 
 <style scoped>
-/*清除浮动*/
-.clearfix::before, .clearfix::after {
-  content:"";
-  display: block;
-  overflow: hidden;
-  height: 0;
-}
-.clearfix::after {
-  clear: both;
-}
-/*头像*/
-.center {
-  padding: 20px 10px;
-  color: #fff;
-  font-size: 16px;
-  background-color: #6388e0;
-}
-.center > div {
-  float: left;
-  width: 50%;
+/* banner */
+.banner {
+  width: 100%;
+  height: 180px;
   text-align: center;
+  color: #fff;
+  box-sizing: border-box;
+  padding-top: 30px;
+  background: -webkit-linear-gradient(#38d6fd, #39adf6); /* Safari 5.1 - 6.0 */
+  background: -o-linear-gradient(#38d6fd, #39adf6); /* Opera 11.1 - 12.0 */
+  background: -moz-linear-gradient(#38d6fd, #39adf6); /* Firefox 3.6 - 15 */
+  background: linear-gradient(#38d6fd, #39adf6); /* 标准的语法 */
+  position: relative;
 }
-div.userinfo {
-  margin-top: 18px;
-  text-align: left;
+.banner .back {
+  font-size: 20px;
+  position: absolute;
+  left: 12px;
+  top: 12px;
 }
-.center img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 4px solid #ececec;
+.user_header i {
+  font-size: 50px;
+}
+.user_header img {
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
   overflow: hidden;
 }
-.center i.iconfont.icon-morentouxiang {
-  font-size: 74px;
+/* 钱包 */
+.wallet {
+  padding: 0 30px;
+  position: relative;
+  top: -40px;
+  z-index: 10;
 }
-.center span {
-  display: block;
+.wallet > div {
+  height: 80px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px 0 rgba(207,227,228,1);
 }
-.center span strong {
-  font-weight: 400;
-  color: #ffd380;
-}
+
 .optionitem {
   text-align: center;
   padding-top: 18px;

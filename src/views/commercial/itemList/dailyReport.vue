@@ -3,22 +3,23 @@
     <!-- 返回导航 -->
     <comm-admin go="itemList"></comm-admin>
     <!-- 下拉框 -->
-    <group>
+    <group :gutter="15">
       <selector title="全部"
                 direction="ltr"
                 :options="list"
+                :value-map="['id', 'f_name']"
                 v-model="defaultValue"
                 @on-change="getdefaultValueSite()"
                 placeholder="请选择站点">
       </selector>
     </group>
-    <div style="margin-top: 10px;">
+    <div>
+      <div class="clearfix totalSum">
+        <span>充电 <strong style="color: orange">{{f_order_count || 0}}</strong> 次</span>
+        <span>总消费 <strong style="color: green">{{f_sum || 0}}</strong> 元</span>
+        <span>耗电 <strong style="color: orange">{{f_kwh || 0}}</strong> 度</span>
+      </div>
       <ul class="tableinfo">
-        <li class="clearfix">
-          <span>充电 <strong style="color: orange">{{f_order_count || 0}}</strong> 次</span>
-          <span>总消费 <strong style="color: green">{{f_sum}}</strong> 元</span>
-          <span>耗电 <strong style="color: orange">{{f_kwh}}</strong> 度</span>
-        </li>
         <li class="clearfix">
           <div>日期</div>
           <div>
@@ -49,15 +50,17 @@
             <span>{{(item.kwh*1).toFixed(2)}}</span>
           </div>
         </li>
+        <li v-if="dayinfo.length == 0" style="text-align: center;">数据为空</li>
       </ul>
       <!-- 点击更多 按钮 -->
       <x-button @click.native="onScrollBottom()" v-if="pagesize <= ratio && pagesizeAll <= ratio">点击加载更多</x-button>
-      <x-button v-else-if="pagesize > ratio || pagesizeAll > ratio">数据全部加载完毕</x-button>
+      <!--<x-button v-else-if="pagesize > ratio || pagesizeAll > ratio"></x-button>-->
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: "dailyReport",
   data() {
@@ -91,11 +94,7 @@ export default {
         .then(res => {
           const {rows, state} = res.data
           if (state === true) {
-            rows.forEach(item => {
-              this.list.push(
-                {key: item.id, value: item.f_name}
-              )
-            })
+            this.list = rows
           }
         })
     },
@@ -104,7 +103,7 @@ export default {
       this.$http
         .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&page=${this.pagesizeAll}&rows=10`)
         .then(res => {
-          console.log(res)
+          // console.log(res)
           const {f_order_count, f_sum, state, rows, total,f_kwh} = res.data
           if (rows.length > 0) {
             this.f_order_count = f_order_count
@@ -125,12 +124,15 @@ export default {
     getdefaultValueSite() {
       this.dayinfo = []
       this.pagesize = 1
+      this.pagesizeAll = 1
       this.$http
         .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&f_chargeStation_id=${this.defaultValue}&page=${this.pagesize}&rows=10`)
         .then(res => {
-          const {rows, total,f_order_count,f_sum} = res.data
+          // console.log(res)
+          const {rows, total,f_order_count,f_sum, f_kwh} = res.data
           this.f_order_count = f_order_count*1
           this.f_sum = (f_sum*1).toFixed(2)
+          this.f_kwh = (f_kwh*1).toFixed(2)
           // 判断数据是否还有
           this.ratio = Math.ceil(total / 10)
           // 判断  数据是否存在
@@ -167,37 +169,30 @@ export default {
       } else {
         this.getSiteInfo()
       }
-    }
+    },
+
   }
 }
 </script>
 
 <style scoped>
-/*清除浮动*/
-.clearfix::before, .clearfix::after {
-  content:"";
-  display: block;
-  overflow: hidden;
-  height: 0;
-}
-.clearfix::after {
-  clear: both;
-}
 /**/
 .comm-body {
   width: 100%;
   height: 100%;
   /*background-color: #efefef*/
 }
-.tableinfo {
-  border-top: 1px solid #dfdfdf;
-  background-color: #fff;
+.totalSum {
+  height: 40px;
+  line-height: 40px;
 }
 .tableinfo li {
+  background-color: #fff;
   border-bottom: 1px solid #dfdfdf;
   padding: 4px 0;
 }
-.tableinfo li > span {
+.tableinfo li > span,
+.totalSum > span {
   display: block;
   float: left;
   width: 33.33%;
@@ -227,5 +222,37 @@ button {
 }
 .weui-btn_default:not(.weui-btn_disabled):active {
   background-color: transparent;
+}
+/**/
+.vux-x-icon {
+  fill: #fff;
+  float: right;
+  position: relative;
+  right: 10px;
+  top: 12px;
+}
+i.confirm {
+  float: right;
+  position: relative;
+  right: 20px;
+}
+i.confirm::after,
+i.confirm::before {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background-color: #fff;
+  position: absolute;
+}
+i.confirm::before {
+  width: 16px;
+  height: 2px;
+  top: 24px;
+  left: -10px;
+}
+i.confirm::after {
+  top: 17px;
+  left: -3px;
 }
 </style>

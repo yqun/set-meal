@@ -3,7 +3,7 @@
     <!-- 返回导航 -->
     <comm-admin go="/commercial"></comm-admin>
     <!-- 扫一扫 -->
-    <group title="注册充电桩" title-color="blue">
+    <group title="注册充电桩" title-color="#39bafc">
       <x-input class="weui-vcode" v-model="saoma1" :show-clear="false">
         <x-button slot="right" type="primary" mini @click.native="facility()">扫一扫</x-button>
       </x-input>
@@ -24,7 +24,7 @@
     </group>
     <span>请选择站点(*必选)</span>
     <div class="btn">
-      <x-button type="primary" @click.native="submitSiteInfo()">提交</x-button>
+      <x-button type="primary" style="background-color: #39bafc;" @click.native="submitSiteInfo()">提交</x-button>
     </div>
     <!-- 信息提示框 -->
     <toast v-model="show" type="text" :text="toastMsg"></toast>

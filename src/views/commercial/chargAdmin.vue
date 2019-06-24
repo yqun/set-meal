@@ -3,7 +3,12 @@
     <!-- 返回导航 -->
     <comm-admin go="commercial"></comm-admin>
     <div class="content">
-      <p><x-button type="primary" mini link="/register/0">添加电桩</x-button></p>
+      <p>
+        <x-button type="primary" link="/register/0" style="background-color: #39bafc; font-size: 16px;">
+          <x-icon type="ios-plus-outline" size="20" style="position: relative;top: 4px; fill: #fff;"></x-icon>
+          添加电桩
+        </x-button>
+      </p>
       <ul class="container">
         <li v-for="item in list" :key="item.id" class="clearfix">
           <div>
@@ -14,20 +19,31 @@
               设备状态：<strong v-if="item.f_state == true" style="color: orange">上线</strong>
               <strong v-else style="color: orange">下线</strong>
             </p>
-            <p>
-              信号：<strong v-if="f_signal == 5 || f_signal == 4" style="color:green">
+              <!-- 其他三类桩 -->
+            <p v-if="item.f_manufacturer != 1">
+              信号：<strong v-if="item.f_overtime == false" style="color:green">
+                    <i class="iconfont icon-WIFIxinhao-ji"></i>
+                  </strong>
+                  <strong v-else-if="item.f_overtime == true" style="color:#ccc">
+                    <i class="iconfont icon-WIFIxinhao-ji1"></i>
+                  </strong>
+              所属电站：<strong style="color: green;">{{item.chargeStation.f_name}}</strong>
+            </p>
+              <!-- 普通充电桩 -->
+            <p v-if="item.f_manufacturer == 1">
+              信号：<strong v-if="item.f_signal == 5 || item.f_signal == 4" style="color:green">
                     <i class="iconfont icon-WIFIxinhao-ji"></i>
                    </strong>
-                   <strong v-else-if="f_signal == 3" style="color:green">
+                   <strong v-else-if="item.f_signal == 3" style="color:green">
                      <i class="iconfont icon-WIFIxinhao-ji1"></i>
                    </strong>
-                   <strong v-else-if="f_signal == 2" style="color:brown">
+                   <strong v-else-if="item.f_signal == 2" style="color:brown">
                      <i class="iconfont icon-WIFIxinhao-ji2"></i>
                    </strong>
-                   <strong v-else-if="f_signal == 1" style="color:#ccc">
+                   <strong v-else-if="item.f_signal == 1" style="color:#ccc">
                      <i class="iconfont icon-WIFIxinhao-ji3"></i>
                    </strong>
-                   <strong v-else-if="f_signal == 0" style="color:#ccc">
+                   <strong v-else-if="item.f_signal == 0" style="color:#ccc">
                      <i class="iconfont icon-WIFIxinhao-wu"></i>
                    </strong>
               所属电站：<strong style="color: green;">{{item.chargeStation.f_name}}</strong>
@@ -36,8 +52,8 @@
           </div>
           <div class="btn">
             <div class="clearfix">
-              <x-button type="primary" mini @click.native="downLine(item.id)">下线</x-button>
-              <x-button type="primary" mini @click.native="upLine(item.id)">上线</x-button>
+              <x-button type="primary" mini @click.native="downLine(item.id)" style="background-color: #39bafc;">下线</x-button>
+              <x-button type="primary" mini @click.native="upLine(item.id)" style="background-color: #39bafc;">上线</x-button>
             </div>
             <div class="clearfix" style="margin-top: 4px;">
               <x-button type="warn" mini @click.native="updateSiteItem(item.id)">重绑</x-button>
@@ -74,13 +90,15 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/wxFindCurrentChargeList.do?token=${this.token}`)
         .then(res => {
+          console.log(res)
           const {state, rows} = res.data
           if (state === true) {
             this.list = rows
             rows.forEach(item => {
+              console.log(item.f_manufacturer)
               // item.f_overtime = true
-              if (item.f_overtime == false) {
-                this.f_signal = item.f_signal
+              if (item.f_overtime == true) {
+                item.f_signal = 0;
               }
             })
           }
@@ -122,16 +140,6 @@ export default {
 </script>
 
 <style scoped>
-/*清除浮动*/
-.clearfix::before, .clearfix::after {
-  content:"";
-  display: block;
-  overflow: hidden;
-  height: 0;
-}
-.clearfix::after {
-  clear: both;
-}
 .comm-body {
   width: 100%;
   height: 100%;
@@ -152,23 +160,18 @@ export default {
   line-height: 20px;
   font-size: 14px;
 }
-.content {
-  padding-left: 10px;
-  background-color: #fff;
-}
 .content > p {
-  padding: 10px 0;
-  border-bottom: 1px solid #efefef;
+  padding: 10px;
 }
 .container li {
-  padding: 10px 10px 10px 0;
+  padding: 10px;
   border-bottom: 1px solid #efefef;
+  background-color: #fff;
 }
 .container li > div {
   float: left;
   width: 65%;
   box-sizing: border-box;
-  /*padding: 0 10px 0 0;*/
 }
 .container li > div.btn {
   width: 35%;

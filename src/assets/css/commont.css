@@ -1,0 +1,11 @@
+/*清除浮动*/
+.clearfix::before, .clearfix::after {
+  content:"";
+  display: block;
+  overflow: hidden;
+  height: 0;
+}
+.clearfix::after {
+  clear: both;
+}
+

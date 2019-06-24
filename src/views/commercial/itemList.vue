@@ -97,6 +97,7 @@ export default {
   border-right: 1px solid #ccc;
   text-align: center;
   padding-top: 10px;
+  background: #fff;
 }
 .item ul li:nth-child(3n) {
   border-right: none;
