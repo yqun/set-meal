@@ -162,7 +162,7 @@ export default {
 .banner .back {
   font-size: 20px;
   position: absolute;
-  left: 12px;
+  left: 8px;
   top: 12px;
 }
 h3 {
@@ -263,7 +263,7 @@ h3:before {
   top: -1px;
   font-size: 10px;
   padding: 0 4px;
-  background-color: #4d89f9;
+  background-color: #39bafc;
   color: #fff;
   border-top-left-radius: 5px;
 }

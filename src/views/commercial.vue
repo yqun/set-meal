@@ -38,4 +38,8 @@ export default {
   height: 100%;
   background-color: #efefef;
 }
+/* cell */
+/deep/ .weui-cells {
+  font-size: 16px;
+}
 </style>

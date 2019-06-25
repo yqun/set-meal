@@ -142,16 +142,6 @@ export default {
 </script>
 
 <style scoped>
-/*清除浮动*/
-.clearfix::before, .clearfix::after {
-  content:"";
-  display: block;
-  overflow: hidden;
-  height: 0;
-}
-.clearfix::after {
-  clear: both;
-}
 .inputcard {
   border-bottom: 1px solid #ccc;
   padding: 10px 20px 10px 10px;
@@ -179,7 +169,7 @@ input {
   top: -1px;
 }
 .cardnum i {
-  color: #1E9FFF;
+  color: #39bafc;
   font-size: 20px;
   vertical-align: middle;
   padding-right: 4px;
@@ -192,10 +182,11 @@ input {
 }
 .flex-demo {
   height: 110px;
-  background-color: #6388e0;
+  background-color: #39bafc;
   border-radius: 10px;
   padding-top: 10px;
   box-sizing: border-box;
+  box-shadow: 2px 2px 4px 2px rgba(207,227,228,0.5);
 }
 .vux-flexbox-item {
   margin-top: 14px !important;

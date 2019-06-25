@@ -1,7 +1,8 @@
 <template>
   <div>
+    <!-- banner -->
     <div class="banner">
-      <span class="back" @click="$router.go(-1)">
+      <span class="back" @click="$router.push('/home')">
         <x-icon type="ios-arrow-left" size="29" fill="#fff" style="vertical-align: bottom"></x-icon>返回
       </span>
       <div class="user_header">
@@ -12,62 +13,47 @@
         {{userInfo.f_phone_num}}
       </div>
     </div>
+    <!-- 钱包余额 -->
     <div class="wallet">
       <div>
-
+        <div class="balance">
+          <p>钱包余额</p>
+          <p style="color: orange">{{userInfo.f_remain_sum}}</p>
+        </div>
+        <div class="recharge_btn">
+          <x-button mini style="background-color: #39bafc;color: #fff;"
+                    @click.native="$router.push('/recharge')">充值</x-button>
+        </div>
       </div>
     </div>
-    <!-- 头像 -->
-    <!--<div class="user" >-->
-      <!--<div class="center clearfix">-->
-        <!--<div class="userheader">-->
-          <!--<img :src="url" v-if="this.url != '0'">-->
-          <!--<i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>-->
-        <!--</div>-->
-        <!--<div class="userinfo">-->
-          <!--<span>{{userInfo.f_nick_name_real || '用户名为空'}}</span>-->
-          <!--<span>{{userInfo.f_phone_num}}</span>-->
-          <!--<span>账户余额 <strong>{{userInfo.f_remain_sum}}</strong> 元</span>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-    <!-- 选项 -->
-    <flexbox>
-      <flexbox-item class="optionitem">
-        <div @click="$router.push('/recharge')">
-          <i class="iconfont icon-chongzhi"></i>
-          <p>充值中心</p>
-        </div>
-      </flexbox-item>
-      <flexbox-item class="optionitem">
-        <div @click="$router.push('/bankcard')">
-          <i class="iconfont icon-yinhangqia2"></i>
-          <p>我的卡包</p>
-        </div>
-      </flexbox-item>
-      <flexbox-item class="optionitem">
-        <div @click="conshow = true">
-          <i class="iconfont icon-icon-test"></i>
-          <p>退款</p>
-        </div>
-      </flexbox-item>
-    </flexbox>
-    <group gutter="8px">
-      <cell title="附近设备" link="/nearby"></cell>
-      <cell title="消费记录" is-link @click.native="expense()"></cell>
-      <cell title="商户入口" is-link @click.native="commercial()"></cell>
-      <cell title="我的收藏" link=""></cell> <!-- /enshrine -->
-      <cell title="更换绑定手机号" link="/login"></cell> <!-- /enshrine -->
-      <cell title="投资加盟"></cell>
-    </group>
-    <group title="">
-      <cell title="返回首页" @click.native="$router.push('/home')"></cell>
+    <group :gutter="10">
+      <cell title="我的卡包" link="/bankcard">
+        <i slot="icon" class="cell_icon iconfont icon-qiabao"></i>
+      </cell>
+      <cell title="退款" is-link @click.native="conshow = true">
+        <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
+      </cell>
+      <cell title="附近设备" link="/nearby">
+        <i slot="icon" class="cell_icon iconfont icon-shebei"></i>
+      </cell>
+      <cell title="消费记录" is-link @click.native="expense()">
+        <i slot="icon" class="cell_icon iconfont icon-jilu"></i>
+      </cell>
+      <cell title="商户入口" is-link @click.native="commercial()">
+        <i slot="icon" class="cell_icon iconfont icon-qiabao"></i>
+      </cell>
+      <cell title="我的收藏" link="">
+        <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
+      </cell> <!-- /enshrine -->
+      <cell title="更换绑定手机号" link="/login">
+        <i slot="icon" class="cell_icon iconfont icon-shebei"></i>
+      </cell> <!-- /enshrine -->
+      <cell title="投资加盟">
+        <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
+      </cell>
     </group>
     <!-- 退款弹窗 -->
-    <confirm v-model="conshow"
-             content="是否确认退款"
-             @on-confirm="cononConfirm()">
-    </confirm>
+    <confirm v-model="conshow" content="是否确认退款" @on-confirm="cononConfirm()"></confirm>
     <!-- 弹框信息 -->
     <toast v-model="showPositionValue" type="text" :time="1000" :text="massage" position="middle" width="14em"></toast>
   </div>
@@ -199,7 +185,7 @@ export default {
 .banner .back {
   font-size: 20px;
   position: absolute;
-  left: 12px;
+  left: 8px;
   top: 12px;
 }
 .user_header i {
@@ -214,31 +200,48 @@ export default {
 /* 钱包 */
 .wallet {
   padding: 0 30px;
+  margin-top: -40px;
   position: relative;
-  top: -40px;
   z-index: 10;
 }
 .wallet > div {
   height: 80px;
   background-color: #fff;
   border-radius: 5px;
-  box-shadow: 2px 2px 3px 0 rgba(207,227,228,1);
+  box-shadow: 1px 2px 4px 0px rgba(207,227,228,1);
+  box-sizing: border-box;
+  padding: 0 40px;
+}
+.wallet > div .balance {
+  float: left;
+  /*width: 50%;*/
+  padding-top: 15px;
+}
+.wallet > div .recharge_btn {
+  float: right;
+  text-align: center;
+  /*width: 50%;*/
+  line-height: 80px;
+}
+.wallet > div .recharge_btn button {
+  font-size: 16px;
+}
+.weui-btn {
+  border-radius: 20px;
+}
+/* cell */
+/deep/ .weui-cells {
+  font-size: 16px;
+}
+/* iconfont */
+/deep/ .weui-cell__hd {
+  padding-right: 10px;
+}
+.cell_icon {
+  font-size: 20px;
+  color: #39bafc;
+  position: relative;
+  top: 1px;
 }
 
-.optionitem {
-  text-align: center;
-  padding-top: 18px;
-}
-.optionitem i {
-  padding: 10px;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  background-color: #10AEFF;
-  color: #fff;
-  font-size: 20px;
-}
-.optionitem p {
-  margin-top: 10px;
-}
 </style>

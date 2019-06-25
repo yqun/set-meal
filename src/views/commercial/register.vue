@@ -2,27 +2,42 @@
   <div>
     <!-- 返回导航 -->
     <comm-admin go="/commercial"></comm-admin>
-    <!-- 扫一扫 -->
-    <group title="注册充电桩" title-color="#39bafc">
-      <x-input class="weui-vcode" v-model="saoma1" :show-clear="false">
-        <x-button slot="right" type="primary" mini @click.native="facility()">扫一扫</x-button>
-      </x-input>
-      <span>请扫描设备通讯卡上的二维码</span>
-      <x-input class="weui-vcode" v-model="saoma2" :show-clear="false">
-        <x-button slot="right" type="primary" mini @click.native="machine()">扫一扫</x-button>
-      </x-input>
-    </group>
-    <span>请扫描随机纸质二维码</span>
-    <!-- 下拉列表 -->
-    <group gutter="0">
-      <selector direction="to"
-                :options="list"
-                v-model="defaultValue"
-                value=""
-                placeholder="请选择站点">
-      </selector>
-    </group>
-    <span>请选择站点(*必选)</span>
+    <div style="margin: 0 15px;">
+      <!-- 扫一扫 -->
+      <group title="注册充电桩" title-color="#39bafc">
+        <x-input value="请扫描设备通讯卡上的二维码" disabled>
+          <!--<x-button slot="right" type="primary" mini @click.native="facility()">扫一扫</x-button>-->
+          <p slot="right" class="scan" @click="facility()">
+            <i class="iconfont icon-saoyisao1"></i>
+            <i class="text">扫一扫</i>
+          </p>
+        </x-input>
+        <x-textarea v-model="saoma1"></x-textarea>
+      </group>
+
+      <group>
+        <x-input value="请扫描随机纸质二维码" disabled>
+          <!--<x-button slot="right" type="primary" mini @click.native="machine()">扫一扫</x-button>-->
+          <p slot="right" class="scan" @click="machine()">
+            <i class="iconfont icon-saoyisao1"></i>
+            <i class="text">扫一扫</i>
+          </p>
+        </x-input>
+        <x-textarea v-model="saoma2"></x-textarea>
+      </group>
+
+      <!-- 下拉列表 -->
+      <group>
+        <selector direction="to"
+                  :options="list"
+                  v-model="defaultValue"
+                  value=""
+                  placeholder="请选择站点">
+        </selector>
+      </group>
+      <span>请选择站点(*必选)</span>
+    </div>
+
     <div class="btn">
       <x-button type="primary" style="background-color: #39bafc;" @click.native="submitSiteInfo()">提交</x-button>
     </div>
@@ -199,19 +214,32 @@ export default {
 </script>
 
 <style scoped>
-#vux-selector-9em65 {
-  color: red !important;
+/deep/ .weui-cells:before,
+/deep/ .weui-cells:after,
+.weui-cell:before {
+  border: 0;
 }
-.weui-vcode {
-  border-bottom: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+/deep/ .weui-cells {
+  border-radius: 10px;
+  box-shadow: 1px 2px 4px 0px rgba(207,227,228,1);
+  position: relative;
 }
-.vux-x-input.weui-cell.weui-vcode::before {
-  position: static;
+.weui-cell {
+  font-size: 14px;
 }
-.weui-cells::after {
-  position: static;
+.scan {
+  text-align: center;
+  color: #39bafc;
 }
+.scan i.iconfont {
+  font-size: 24px;
+  display: block;
+}
+.scan i.text {
+  font-size: 12px;
+  font-style:normal;
+}
+
 .btn {
   margin-top: 20px;
   padding: 0 10px;
@@ -221,4 +249,5 @@ span {
   font-size: 14px;
   margin: 0 16px;
 }
+
 </style>

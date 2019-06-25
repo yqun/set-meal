@@ -29,6 +29,9 @@ import { XInput } from 'vux'
 import { XTable } from 'vux'
 import { Loading } from 'vux'
 import { Datetime } from 'vux'
+import { XTextarea } from 'vux'
+
+
 
 // 导入css
 import './assets/font/iconfont.css'
@@ -67,6 +70,7 @@ Vue.component('x-input', XInput)
 Vue.component('x-table', XTable)
 Vue.component('loading', Loading)
 Vue.component('datetime', Datetime)
+Vue.component('x-textarea', XTextarea)
 
 new Vue({
   el: '#app',

@@ -11,65 +11,127 @@
         <a :href="item.url"><img :src="item.img" alt=""></a>
       </swiper-item>
     </swiper>
-    <!-- flexbox -->
-    <flexbox :gutter="0">
-      <flexbox-item>
-        <div class="option" @click="personal()"><img src="../assets/images/充电桩_03.png" alt=""><p>个人中心</p></div>
-      </flexbox-item>
-      <flexbox-item>
-        <div class="option" @click="$router.push('/recharge')">
-          <img src="../assets/images/充电桩_05.png" alt=""><p>充值中心</p>
-        </div>
-      </flexbox-item>
-      <flexbox-item>
-        <div class="option" @click="expense()"><img src="../assets/images/充电桩_07.png" alt=""><p>我的订单</p></div>
-      </flexbox-item>
-      <flexbox-item>
-        <div class="option"><img src="../assets/images/充电桩_09.png" alt=""><p>公众号</p></div>
-      </flexbox-item>
-      <flexbox-item>
-        <div class="option"><img src="../assets/images/充电桩_11.png" alt=""><p>投资加盟</p></div>
-      </flexbox-item>
-    </flexbox>
-    <!-- 新起点嘉园 -->
-    <div class="content">
-      <flexbox>
-        <flexbox-item :span="4">
-          <div class="content-pic">
-            <img :src="imageUrl" alt="">
+    <!-- 导航 -->
+    <div class="nav">
+      <ul class="clearfix">
+        <li>
+          <div class="images" @click="personal()">
+            <img src="../assets/images/充电桩_03.png" alt="">
           </div>
-        </flexbox-item>
-        <flexbox-item>
-          <div class="content-txt">
-            <span>编号:{{ sn_num }}</span>
-            <span>
-              当前信号:
-              <strong v-if="this.signal == 5 || this.signal == 4" style="color:green">
-                <i class="iconfont icon-WIFIxinhao-ji"></i>
-              </strong>
-              <strong v-if="this.signal == 3" style="color:green">
-                <i class="iconfont icon-WIFIxinhao-ji1"></i>
-              </strong>
-              <strong v-if="this.signal == 2" style="color:brown">
-                <i class="iconfont icon-WIFIxinhao-ji2"></i>
-              </strong>
-              <strong v-if="this.signal == 1" style="color:#ccc">
-                <i class="iconfont icon-WIFIxinhao-ji3"></i>
-              </strong>
-              <strong v-if="this.signal == 0" style="color:#ccc">
-                <i class="iconfont icon-WIFIxinhao-wu"></i>
-              </strong>
-            </span>
-            <p>可用插座数:<strong> {{ this.pointer_free_count }} </strong></p>
-            <p>已选择插座号:
-              <strong v-if="chooseconfirmList.f_order == null">未选择</strong>
-              <strong v-else-if="chooseconfirmList.f_order !== null">{{chooseconfirmList.f_order}}</strong>
-            </p>
-            <p class="scan" @click="againscan()"><i class="iconfont icon-saoyisao"></i>扫一扫</p>
+          <div class="text">个人中心</div>
+        </li>
+        <li>
+          <div class="images" @click="$router.push('/recharge')">
+            <img src="../assets/images/充电桩_05.png" alt="">
           </div>
-        </flexbox-item>
-      </flexbox>
+          <div class="text">充值中心</div>
+        </li>
+        <li>
+          <div class="images" @click="expense()">
+            <img src="../assets/images/充电桩_07.png" alt="">
+          </div>
+          <div class="text">我的订单</div>
+        </li>
+        <li>
+          <div class="images"><img src="../assets/images/充电桩_09.png" alt=""></div>
+          <div class="text">公众号</div>
+        </li>
+        <li>
+          <div class="images"><img src="../assets/images/充电桩_11.png" alt=""></div>
+          <div class="text">投资加盟</div>
+        </li>
+      </ul>
     </div>
+    <!-- flexbox -->
+    <!--<flexbox :gutter="0">-->
+      <!--<flexbox-item>-->
+        <!--<div class="option" @click="personal()"><img src="../assets/images/充电桩_03.png" alt=""><p>个人中心</p></div>-->
+      <!--</flexbox-item>-->
+      <!--<flexbox-item>-->
+        <!--<div class="option" @click="$router.push('/recharge')">-->
+          <!--<img src="../assets/images/充电桩_05.png" alt=""><p>充值中心</p>-->
+        <!--</div>-->
+      <!--</flexbox-item>-->
+      <!--<flexbox-item>-->
+        <!--<div class="option" @click="expense()"><img src="../assets/images/充电桩_07.png" alt=""><p>我的订单</p></div>-->
+      <!--</flexbox-item>-->
+      <!--<flexbox-item>-->
+        <!--<div class="option"><img src="../assets/images/充电桩_09.png" alt=""><p>公众号</p></div>-->
+      <!--</flexbox-item>-->
+      <!--<flexbox-item>-->
+        <!--<div class="option"><img src="../assets/images/充电桩_11.png" alt=""><p>投资加盟</p></div>-->
+      <!--</flexbox-item>-->
+    <!--</flexbox>-->
+    <!-- 新起点嘉园 -->
+    <div class="equipment">
+      <div class="equipment_state">
+        <p class="equipment_num"><strong>编号:{{ sn_num }}</strong></p>
+        <p class="equipment_signal equipment_info">
+          当前信号:
+          <strong v-if="this.signal == 5 || this.signal == 4" style="color:green">
+            <i class="iconfont icon-WIFIxinhao-ji"></i>
+          </strong>
+          <strong v-if="this.signal == 3" style="color:green">
+            <i class="iconfont icon-WIFIxinhao-ji1"></i>
+          </strong>
+          <strong v-if="this.signal == 2" style="color:brown">
+            <i class="iconfont icon-WIFIxinhao-ji2"></i>
+          </strong>
+          <strong v-if="this.signal == 1" style="color:#ccc">
+            <i class="iconfont icon-WIFIxinhao-ji3"></i>
+          </strong>
+          <strong v-if="this.signal == 0" style="color:#ccc">
+            <i class="iconfont icon-WIFIxinhao-wu"></i>
+          </strong>
+        </p>
+        <p class="equipment_socket_sum equipment_info">可用插座数:<strong> {{ this.pointer_free_count }} </strong></p>
+        <p class="equipment_socket_num equipment_info">已选择插座号:
+          <strong v-if="chooseconfirmList.f_order == null">未选择</strong>
+          <strong v-else-if="chooseconfirmList.f_order !== null">{{chooseconfirmList.f_order}}</strong>
+        </p>
+      </div>
+      <div class="again_scan">
+        <img src="../assets/images/充电桩00.png" alt="" @click="againscan()">
+      </div>
+    </div>
+    <!--<div class="content">-->
+      <!--<flexbox>-->
+        <!--<flexbox-item :span="4">-->
+          <!--<div class="content-pic">-->
+            <!--<img :src="imageUrl" alt="">-->
+          <!--</div>-->
+        <!--</flexbox-item>-->
+        <!--<flexbox-item>-->
+          <!--<div class="content-txt">-->
+            <!--<span>编号:{{ sn_num }}</span>-->
+            <!--<span>-->
+              <!--当前信号:-->
+              <!--<strong v-if="this.signal == 5 || this.signal == 4" style="color:green">-->
+                <!--<i class="iconfont icon-WIFIxinhao-ji"></i>-->
+              <!--</strong>-->
+              <!--<strong v-if="this.signal == 3" style="color:green">-->
+                <!--<i class="iconfont icon-WIFIxinhao-ji1"></i>-->
+              <!--</strong>-->
+              <!--<strong v-if="this.signal == 2" style="color:brown">-->
+                <!--<i class="iconfont icon-WIFIxinhao-ji2"></i>-->
+              <!--</strong>-->
+              <!--<strong v-if="this.signal == 1" style="color:#ccc">-->
+                <!--<i class="iconfont icon-WIFIxinhao-ji3"></i>-->
+              <!--</strong>-->
+              <!--<strong v-if="this.signal == 0" style="color:#ccc">-->
+                <!--<i class="iconfont icon-WIFIxinhao-wu"></i>-->
+              <!--</strong>-->
+            <!--</span>-->
+            <!--<p>可用插座数:<strong> {{ this.pointer_free_count }} </strong></p>-->
+            <!--<p>已选择插座号:-->
+              <!--<strong v-if="chooseconfirmList.f_order == null">未选择</strong>-->
+              <!--<strong v-else-if="chooseconfirmList.f_order !== null">{{chooseconfirmList.f_order}}</strong>-->
+            <!--</p>-->
+            <!--<p class="scan" @click="againscan()"><i class="iconfont icon-saoyisao"></i>扫一扫</p>-->
+          <!--</div>-->
+        <!--</flexbox-item>-->
+      <!--</flexbox>-->
+    <!--</div>-->
     <!-- 套餐选择 -->
     <flexbox class="choose" orient="vertical" :gutter="0" v-if="f_charger_type == 1">
       <flexbox-item><h4>套餐选择</h4></flexbox-item>
@@ -585,75 +647,136 @@ ul>li {
   width: 100%;
   height: 100%;
 }
-.option {
-  text-align: center;
+/*.option {*/
+  /*text-align: center;*/
+  /*padding-top: 20px;*/
+/*}*/
+/*.option img {*/
+  /*width: 60%;*/
+  /*vertical-align: middle;*/
+/*}*/
+/*.option i {*/
+  /*font-size: 26px;*/
+  /*padding: 10px;*/
+  /*-webkit-border-radius: 50%;*/
+  /*-moz-border-radius: 50%;*/
+  /*border-radius: 50%;*/
+  /*background-color: #10AEFF;*/
+  /*color: #fff;*/
+/*}*/
+/*.option p {*/
+  /*font-size: 14px;*/
+  /*margin-top: 8px;*/
+/*}*/
+/* 导航 */
+.nav ul {
+  margin: 15px 10px 0;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 1px 2px 4px 0px rgba(207,227,228,1)
+}
+.nav ul li {
+  height: 100px;
+  float: left;
+  width: 20%;
+  background-color: #fff;
+  box-sizing: border-box;
   padding-top: 20px;
 }
-.option img {
-  width: 60%;
-  vertical-align: middle;
+.nav ul li div {
+  text-align: center;
 }
-.option i {
-  font-size: 26px;
-  padding: 10px;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  background-color: #10AEFF;
-  color: #fff;
+.nav ul li div.images img{
+  width: 50px;
 }
-.option p {
-  font-size: 14px;
-  margin-top: 8px;
+.nav ul li div.text{
+  font-size: 12px;
 }
 /* 新起点嘉园 */
-.content {
-  margin-top: 10px;
-  padding: 0 0 0 10px;
+.equipment{
+  margin: 15px 10px;
+  padding: 0 15px;
+  height: 110px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 1px 2px 4px 0px rgba(207,227,228,1)
 }
-.content p {
-  color: #757575;
-  font-size: 16px;
+.equipment .equipment_state {
+  height: 100%;
+  float: left;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
 }
-.content p strong {
-  color: green;
-}
-.content span {
-  display: block;
-  color: #757575;
-  font-size: 16px;
-}
-.content-pic {
-  width: 90%;
-  height: 120px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin: 0 auto;
-  overflow: hidden;
-}
-.content-pic img {
-  display: block;
-  height: 100px;
-  margin: 10px auto;
-}
-.content-txt {
+.equipment .again_scan {
+  float: right;
+  height: 100%;
   position: relative;
 }
-p.scan {
+.equipment .equipment_num {
+  font-size: 16px;
+  color: #333;
+}
+.equipment .equipment_info {
+  font-size: 14px;
+  color: #666;
+}
+.equipment .again_scan img {
+  height: 80%;
+  margin: auto;
   position: absolute;
-  right: 20px;
-  top: 28px;
-  width: 40px;
-  height: 40px;
-  background-color: #10AEFF;
-  border-radius: 50%;
-  color: #fff;
-  text-align: center;
-  font-size: 8px;
+  top: 0;
+  bottom: 0;
+  right: 0;
 }
-p.scan i{
-  display: block;
-}
+/* 新起点嘉园 */
+/*.content {*/
+  /*margin-top: 10px;*/
+  /*padding: 0 0 0 10px;*/
+/*}*/
+/*.content p {*/
+  /*color: #757575;*/
+  /*font-size: 16px;*/
+/*}*/
+/*.content p strong {*/
+  /*color: green;*/
+/*}*/
+/*.content span {*/
+  /*display: block;*/
+  /*color: #757575;*/
+  /*font-size: 16px;*/
+/*}*/
+/*.content-pic {*/
+  /*width: 90%;*/
+  /*height: 120px;*/
+  /*border: 1px solid #ccc;*/
+  /*border-radius: 10px;*/
+  /*margin: 0 auto;*/
+  /*overflow: hidden;*/
+/*}*/
+/*.content-pic img {*/
+  /*display: block;*/
+  /*height: 100px;*/
+  /*margin: 10px auto;*/
+/*}*/
+/*.content-txt {*/
+  /*position: relative;*/
+/*}*/
+/*p.scan {*/
+  /*position: absolute;*/
+  /*right: 20px;*/
+  /*top: 28px;*/
+  /*width: 40px;*/
+  /*height: 40px;*/
+  /*background-color: #10AEFF;*/
+  /*border-radius: 50%;*/
+  /*color: #fff;*/
+  /*text-align: center;*/
+  /*font-size: 8px;*/
+/*}*/
+/*p.scan i{*/
+  /*display: block;*/
+/*}*/
   /*套餐选择*/
 .choose {
   box-sizing:border-box;

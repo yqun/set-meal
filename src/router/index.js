@@ -62,15 +62,16 @@ router.beforeEach((to, from, next) => {
   } else {
     const token = sessionStorage.getItem('token')
     if (!token) {
-      router.push('/home')
+      // router.push('/home')
+      next()
     } else {
       next()
     }
   }
-  // console.log(from)
-  if (to.path === '/expense' || to.path === '/personal') {
-    // console.log(1)
-  }
+  // if (to.path === '/expense' || to.path === '/personal') {
+  //   console.log(1)
+  //   next()
+  // }
 })
 
 export default router
