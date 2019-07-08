@@ -91,12 +91,14 @@ export default {
     // 立即充值
     nowrecharge() {
       this.f_product_id = this.rechargelist[this.index].id
-      console.log(this.f_product_id)
+      // console.log(this.f_product_id)
       // 跳转地址
       this.$http.get(`${this.apiHost}weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.f_product_id}`)
         .then(res => {
           this.orderId = res.data.orderId
           const that = this;
+          // 充值说明：充值费用只限于充电，不能退回!
+
           wx.config({
             debug: false,
             appId: res.data.appId,
@@ -105,31 +107,39 @@ export default {
             signature: res.data.signature,
             jsApiList: ["chooseWXPay"]
           });
-
-          wx.chooseWXPay({
-            timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-            nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
-            package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
-            signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-            paySign: res.data.paySign, // 支付签名
-            success: function (res) {
-              // 支付成功后的回调函数
-              this.getUserInfo()
-              // if (res.errMsg == "chooseWXPay:ok") {
-              //   alert("支付成功！");
-              // } else {
-              //   alert("支付失败" + res.errMsg);
-              // }
-            },
-            fail: function (res) {
-              that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
-            },
-            cancel: function (res) {
-              //支付取消
-              alert('支付取消');
-              that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+          this.$vux.confirm.show({
+            title: '充值说明',
+            content: '充值费用只限于充电，不能退回!',
+            showCancelButton: false,
+            // 组件除show外的属性
+            onConfirm : () => {
+              wx.chooseWXPay({
+                timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
+                package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+                signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                paySign: res.data.paySign, // 支付签名
+                success: function (res) {
+                  // 支付成功后的回调函数
+                  this.getUserInfo()
+                  // if (res.errMsg == "chooseWXPay:ok") {
+                  //   alert("支付成功！");
+                  // } else {
+                  //   alert("支付失败" + res.errMsg);
+                  // }
+                },
+                fail: function (res) {
+                  that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+                },
+                cancel: function (res) {
+                  //支付取消
+                  alert('支付取消');
+                  that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+                }
+              });
             }
-          });
+          })
+
         })
         .catch(err => {
           alert(err)
@@ -164,6 +174,7 @@ export default {
   position: absolute;
   left: 8px;
   top: 12px;
+  line-height: 27px;
 }
 h3 {
   padding: 10px 10px;
@@ -221,41 +232,10 @@ h3:before {
   background: -moz-linear-gradient(#38d6fd, #39adf6); /* Firefox 3.6 - 15 */
   background: linear-gradient(#38d6fd, #39adf6); /* 标准的语法 */
 }
+.vux-button-group > a.vux-button-group-current p,
 .vux-button-group > a.vux-button-group-current strong {
   color: #fff;
 }
-/*.vux-button-group > a.vux-button-group-current p:after {*/
-  /*content:'';*/
-  /*width: 0px;*/
-  /*height: 0px;*/
-  /*border-radius: 0;*/
-  /*border-bottom: 15px solid transparent;*/
-  /*border-top: 15px solid #01AAED;;*/
-  /*border-right: 15px solid transparent;*/
-  /*border-left: 15px solid transparent;*/
-  /*transform:rotate(-45deg);*/
-  /*position: absolute;*/
-  /*right: -15px;*/
-  /*bottom: -15px;*/
-/*}*/
-/*.vux-button-group > a.vux-button-group-current strong:after,*/
-/*.vux-button-group > a.vux-button-group-current strong:before{*/
-  /*display: block;*/
-  /*position: absolute;*/
-  /*right: 4px;*/
-  /*bottom: 0;*/
-  /*content: '';*/
-  /*width: 1px;*/
-  /*height: 12px;*/
-  /*background-color: #fff;*/
-  /*transform: rotate(40deg);*/
-/*}*/
-/*.vux-button-group > a.vux-button-group-current strong:before {*/
-  /*transform: rotate(-45deg);*/
-  /*height: 6px;*/
-  /*right: 10px;*/
-  /*bottom: 1px;*/
-/*}*/
 .mealchoose-item span {
   display: block;
   position: absolute;

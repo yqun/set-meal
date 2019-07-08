@@ -62,8 +62,8 @@ router.beforeEach((to, from, next) => {
   } else {
     const token = sessionStorage.getItem('token')
     if (!token) {
-      // router.push('/home')
-      next()
+      router.push('/home')
+      // next()
     } else {
       next()
     }

@@ -90,12 +90,12 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/wxFindCurrentChargeList.do?token=${this.token}`)
         .then(res => {
-          console.log(res)
+          // console.log(res)
           const {state, rows} = res.data
           if (state === true) {
             this.list = rows
             rows.forEach(item => {
-              console.log(item.f_manufacturer)
+              // console.log(item.f_manufacturer)
               // item.f_overtime = true
               if (item.f_overtime == true) {
                 item.f_signal = 0;
@@ -111,6 +111,13 @@ export default {
         this.$http
           .get(`${this.apiHost}charger/weixin/wxDeleteCharger.do?token=${this.token}&id=${id}`)
           .then(res => {
+            const {data} = res
+            if (data.state) {
+              this.$vux.toast.text('删除成功')
+            }
+            if (!data.state) {
+              this.$vux.toast.text(data.error)
+            }
             this.getSitelist()
           })
       }
@@ -120,6 +127,13 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/wxOnLineChargers.do?token=${this.token}&id=${id}`)
         .then(res => {
+          const {data} = res
+          if (data.state) {
+            this.$vux.toast.text('操作成功')
+          }
+          if (!data.state) {
+            this.$vux.toast.text(data.error)
+          }
           this.getSitelist()
         })
     },
@@ -128,6 +142,13 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/wxOffLineChargers.do?token=${this.token}&id=${id}`)
         .then(res => {
+          const {data} = res
+          if (data.state) {
+            this.$vux.toast.text('操作成功')
+          }
+          if (!data.state) {
+            this.$vux.toast.text(data.error)
+          }
           this.getSitelist()
         })
     },

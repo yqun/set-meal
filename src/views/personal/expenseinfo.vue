@@ -71,8 +71,9 @@ export default {
       this.$http
         .get(`${this.apiHost}/Order/weixin/wxFindOrderDetail.do?token=${this.token}&f_order_id=${expenseId}`)
         .then(res => {
+          // console.log(res)
           const {powers} = res.data.order
-          if (powers) {
+          if (powers.length) {
             this.rests = []
             // 循环 得到 powers数据
             powers.forEach(item => {

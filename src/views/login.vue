@@ -1,28 +1,37 @@
 <template>
   <div class="comm-body" @touchmove.prevent>
-    <!--<img src="../assets/images/bj.jpg" alt="">-->
-    <div>
-      <div class="content" :style="contentstyle" ref="getfocus" @focusin="show()" @focusout="hide()">
-        <!-- 手机登陆 -->
-        <x-input title="手机号码" name="mobile" type="tel" placeholder="请输入手机号码" keyboard="number" v-model="cellPhone" mask="99999999999"></x-input>
-        <x-input title="图片验证码" placeholder="请输入图片验证码" class="weui-vcode" :max='4' v-model="picverification" :show-clear="false">
-          <img slot="right"
-               :src="imagesUrl"
-               alt="" width="100"
-               @click="changeImages()"
-               style="border-radius:10px;display: block;"/>
-        </x-input>
-        <x-input title="手机验证码" placeholder="请输入手机验证码" class="weui-vcode" :max='max' v-model="Verification" style="top: -2px;">
-          <x-button slot="right" type="primary" mini :disabled="disabledBool" @click.native="getVerification()">{{btnText}}</x-button>
-        </x-input>
-        <!-- 登录按钮 -->
-        <div class="login">
-          <x-button type="primary" @click.native="getLoginMsg()">确认登陆</x-button>
-        </div>
+    <div class="content" :style="contentstyle" ref="getfocus" @focusin="show()" @focusout="hide()">
+      <!-- 手机登陆 -->
+      <x-input type="tel" placeholder="请输入手机号码" keyboard="number" v-model="cellPhone" mask="99999999999">
+        <i slot="label" class="iconfont icon-shouji"></i>
+      </x-input>
+      <x-input title="图片验证码" placeholder="请输入图片验证码" class="weui-vcode" :max='4' v-model="picverification" :show-clear="false">
+        <i slot="label" class="iconfont icon-renzhengdunpaianquanbaozhangzhibao-xianxing"></i>
+        <img slot="right"
+             :src="imagesUrl"
+             alt="" width="100"
+             @click="changeImages()"
+             style="border-radius:0px;display: block;"/>
+      </x-input>
+      <x-input title="手机验证码" placeholder="请输入手机验证码" class="weui-vcode" :max='max' v-model="Verification">
+        <i slot="label" class="iconfont icon-icon--"></i>
+        <x-button slot="right" type="primary" mini
+                  style="background-color: #39bafc; border-radius: 20px;"
+                  :disabled="disabledBool"
+                  @click.native="getVerification()">
+          {{btnText}}
+        </x-button>
+      </x-input>
+      <!-- 登录按钮 -->
+      <div class="login">
+        <x-button type="primary" @click.native="getLoginMsg()"
+                  style="background-color: #39bafc; border-radius: 20px;">
+          登 录
+        </x-button>
       </div>
-      <!-- toast信息提示 -->
-      <toast v-model="showToast" type="text" :time="800" is-show-mask :text="toastVal" position="middle"></toast>
     </div>
+    <!-- toast信息提示 -->
+    <toast v-model="showToast" type="text" :time="800" is-show-mask :text="toastVal" position="middle"></toast>
   </div>
 </template>
 
@@ -48,7 +57,6 @@ export default {
     }
   },
   created() {
-    // console.log(window)
     this.judgeToken();
     this.changeImages();
   },
@@ -134,7 +142,7 @@ export default {
           .get(`${this.apiHost}member/weixin/authenticMember.do?token=${this.token}&f_phone_num=${this.cellPhone}&code=${this.Verification}&f_img_code=${this.picverification}`)
           .then(res => {
             const {state} = res.data
-            const toAddress = this.$route.query.to
+            const toAddress = this.$route.query.to? this.$route.query.to:'personal'
             if (state == true) {
               this.$router.push(`/${toAddress}`)
             } else {
@@ -152,45 +160,38 @@ export default {
 .comm-body {
   width: 100%;
   height: 100%;
-  background-color: black;
-  background:black url("../assets/images/bj.jpg") no-repeat top;
-}
-/*.comm-body > img {*/
-  /*height: 700px;*/
-/*}*/
-.comm-body > div {
-  height: 100%;
-  width: 100%;
-  background: rgba(0,0,0,0.5);
-  box-sizing: border-box;
+  background: #fff url("../assets/images/bj.jpg") no-repeat top/100%;
 }
 .content {
   position: absolute;
+  box-sizing: border-box;
+  padding: 0 20px;
 }
 .login {
   width: 100%;
   box-sizing: border-box;
   padding: 20px 10px;
 }
-div.vux-x-input.weui-cell {
-  color: #fff !important;
+div.vux-x-input.weui-cell /deep/ .weui-cell__hd {
+  margin-right: 20px;
 }
-div.vux-x-input.weui-cell.weui-vcode::after {
-  content: " ";
+div.vux-x-input.weui-cell i {
+  color: #39bafc;
+  font-size: 20px;
+}
+div.vux-x-input.weui-cell.weui-vcode::before {
+  border: none;
+}
+div.vux-x-input.weui-cell::after {
+  content: "";
   position: absolute;
-  left: 0;
   bottom: 0;
-  right: 0;
+  right: 15px;
   height: 1px;
-  border-top: 1px solid #D9D9D9;
-  color: #D9D9D9;
-  -webkit-transform-origin: 0 0;
-  transform-origin: 0 0;
-  -webkit-transform: scaleY(0.5);
-  transform: scaleY(0.5);
+  border-bottom: 1px solid #e1e1e1;
   left: 15px;
 }
 .vux-x-input.weui-cell /deep/ .weui-cell__bd {
-  font-size: 18px;
+  font-size: 14px;
 }
 </style>

@@ -4,7 +4,7 @@ import Vue from 'vue'
 import FastClick from 'fastclick'
 import App from './App'
 import router from './router'
-import HttpTool from './pulign/axios'
+// import HttpTool from './pulign/axios'
 import global from './static/global'
 // 自定义全局组件
 import commAdmin from '@/component/commAdmin'
@@ -30,7 +30,9 @@ import { XTable } from 'vux'
 import { Loading } from 'vux'
 import { Datetime } from 'vux'
 import { XTextarea } from 'vux'
-
+import  { ToastPlugin } from 'vux'
+import  { ConfirmPlugin } from 'vux'
+import  { LoadingPlugin } from 'vux'
 
 
 // 导入css
@@ -38,7 +40,7 @@ import './assets/font/iconfont.css'
 import './assets/font01/iconfont.css'
 import './assets/css/commont.css'
 
-Vue.use(HttpTool)
+// Vue.use(HttpTool)
 Vue.use(AjaxPlugin)
 Vue.prototype.apiHost = global.apiHost
 
@@ -71,6 +73,11 @@ Vue.component('x-table', XTable)
 Vue.component('loading', Loading)
 Vue.component('datetime', Datetime)
 Vue.component('x-textarea', XTextarea)
+Vue.use(ToastPlugin)
+Vue.use(ConfirmPlugin)
+Vue.use(LoadingPlugin)
+
+
 
 new Vue({
   el: '#app',

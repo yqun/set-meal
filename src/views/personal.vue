@@ -27,28 +27,28 @@
       </div>
     </div>
     <group :gutter="10">
-      <cell title="我的卡包" link="/bankcard">
+      <cell v-if="false" title="我的卡包" link="/bankcard">
         <i slot="icon" class="cell_icon iconfont icon-qiabao"></i>
       </cell>
-      <cell title="退款" is-link @click.native="conshow = true">
+      <cell v-if="false" title="退款" is-link @click.native="conshow = true">
         <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
       </cell>
-      <cell title="附近设备" link="/nearby">
+      <cell v-if="false" title="附近设备" link="/nearby">
         <i slot="icon" class="cell_icon iconfont icon-shebei"></i>
       </cell>
       <cell title="消费记录" is-link @click.native="expense()">
         <i slot="icon" class="cell_icon iconfont icon-jilu"></i>
       </cell>
-      <cell title="商户入口" is-link @click.native="commercial()">
+      <cell v-if="charger" title="商户入口" is-link @click.native="commercial()">
         <i slot="icon" class="cell_icon iconfont icon-qiabao"></i>
       </cell>
-      <cell title="我的收藏" link="">
+      <cell v-if="false" title="我的收藏" link="">
         <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
       </cell> <!-- /enshrine -->
       <cell title="更换绑定手机号" link="/login">
         <i slot="icon" class="cell_icon iconfont icon-shebei"></i>
       </cell> <!-- /enshrine -->
-      <cell title="投资加盟">
+      <cell v-if="false" title="投资加盟">
         <i slot="icon" class="cell_icon iconfont icon-tuikuanguanli"></i>
       </cell>
     </group>
@@ -83,6 +83,7 @@ export default {
       massage: '',
       showPositionValue: false,
       conshow: false,
+      charger: false,
     }
   },
   created() {
@@ -141,7 +142,9 @@ export default {
     getuserInfo () {
       this.$http.get(this.apiHost + `member/weixin/getPersonalInfo.do?token=${this.token}`)
         .then(res => {
-          const {member} = res.data
+          // console.log(res)
+          const {member, charger} = res.data
+          this.charger = charger
           member.f_remain_sum = member.f_remain_sum.toFixed(2)
           this.userInfo = member
           if (member.f_head_portrait == '') {
@@ -187,6 +190,7 @@ export default {
   position: absolute;
   left: 8px;
   top: 12px;
+  line-height: 27px;
 }
 .user_header i {
   font-size: 50px;
