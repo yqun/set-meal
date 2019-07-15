@@ -98,13 +98,13 @@
               v-for="item in noFinishedSetMeal"
               :key="item.id"
               @click.stop="stopcharge(item.id)">
-          {{item.f_sum}}元{{item.f_minute}}分钟正在充电
+          {{item.f_sum}}元{{item.f_minute}}分钟正在充电　　点击可结束充电
         </span>
         <span v-if="item.f_product_type == 3"
               v-for="item in noFinishedSetMeal"
               :key="item.id"
               @click.stop="stopcharge(item.id)">
-          充满自停正在充电
+          充满自停正在充电　　点击可结束充电
         </span>
       </marquee>
     </div>
