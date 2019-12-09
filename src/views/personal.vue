@@ -2,7 +2,7 @@
   <div>
     <!-- banner -->
     <div class="banner">
-      <span class="back" @click="$router.push('/home')">
+      <span class="back" @click="$router.replace('/home')">
         <x-icon type="ios-arrow-left" size="29" fill="#fff" style="vertical-align: bottom"></x-icon>返回
       </span>
       <div class="user_header">
@@ -142,7 +142,7 @@ export default {
     getuserInfo () {
       this.$http.get(this.apiHost + `member/weixin/getPersonalInfo.do?token=${this.token}`)
         .then(res => {
-          // console.log(res)
+          console.log(res)
           const {member, charger} = res.data
           this.charger = charger
           member.f_remain_sum = member.f_remain_sum.toFixed(2)

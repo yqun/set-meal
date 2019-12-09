@@ -83,9 +83,11 @@ export default {
               if (f_electric_wire_temp) this.rests.push({name: '线缆温度',value: f_electric_wire_temp,date: f_time})
               if (f_voltage) this.rests.push({name: '电压',   value: f_voltage,date: f_time})
             })
+            if (!this.rests.length) return false;
             this.rests.sort((a,b) => {
               return a.value - b.value
             })
+            console.log(this.rests)
             const maxValue = this.rests[this.rests.length - 1].value
             chart.source(this.rests, {
               date: {

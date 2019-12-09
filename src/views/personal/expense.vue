@@ -69,6 +69,7 @@ export default {
     getIndent () {
       this.$http.get(this.apiHost + `Order/weixin/findOrderByMember.do?token=${this.token}&page=${this.pagesize}&rows=10`)
         .then(res => {
+          // console.log(res)
           const {rows, total} = res.data
           this.ratio = Math.ceil(total / 10)
           rows.forEach(item => {

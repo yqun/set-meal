@@ -94,17 +94,25 @@
                scrollamount="4"
                hspace=20
                vspace=20>
-        <span v-if="item.f_product_type != 3"
+
+        <span v-if="item.f_product_type != 3 && item.f_charger_type == 1"
               v-for="item in noFinishedSetMeal"
               :key="item.id"
               @click.stop="stopcharge(item.id)">
           {{item.f_sum}}元{{item.f_minute}}分钟正在充电　　点击可结束充电
         </span>
-        <span v-if="item.f_product_type == 3"
+
+        <span v-if="item.f_product_type == 3 && item.f_charger_type == 1"
               v-for="item in noFinishedSetMeal"
               :key="item.id"
               @click.stop="stopcharge(item.id)">
           充满自停正在充电　　点击可结束充电
+        </span>
+        <span v-if="item.f_charger_type == 2"
+              v-for="item in noFinishedSetMeal"
+              :key="item.id"
+              @click.stop="stopcharge(item.id)">
+          充电正在进行，点击可结束充电。
         </span>
       </marquee>
     </div>
@@ -220,9 +228,9 @@
       </div>
     </confirm>
     <confirm v-model="confirmState" title="详细说明" :show-cancel-button="false">
-      <p class="confirmconent">充电功率<250W，100%套餐时长充电</p>
-      <p class="confirmconent">250W≤充电功率<500W，50%套餐时长充电</p>
-      <p class="confirmconent">500W≤充电功率<800W，25%套餐时长充电</p>
+      <p class="confirmconent">充电功率<{{powerInfo.f_power_first}}W，{{powerInfo.f_rate_first}}%套餐时长充电</p>
+      <p class="confirmconent">{{powerInfo.f_power_first}}W≤充电功率<{{powerInfo.f_power_second}}W，{{powerInfo.f_rate_second}}%套餐时长充电</p>
+      <p class="confirmconent">{{powerInfo.f_power_second}}W≤充电功率<{{powerInfo.f_power_third}}W，{{powerInfo.f_rate_third}}%套餐时长充电</p>
     </confirm>
     <!-- 按钮 -->
     <div class="submit">
@@ -315,6 +323,7 @@ export default {
       state: false,
       show: false,
       title: '请选择插座',
+      powerInfo: {}, // 详细说明功率
       // 循环插座
       confirmList: [],
       // 选择的插座
@@ -392,6 +401,7 @@ export default {
             const { state } = res.data
             if (state == true) {
               const {f_sn_num, f_manufacturer} = res.data.charge
+              this.powerInfo = res.data.charge
               this.sn_num = f_sn_num
               this.f_manufacturer = f_manufacturer
               window.sessionStorage.setItem('sn_num', this.sn_num);
@@ -532,19 +542,20 @@ export default {
       })[0]
       // console.log(this.noFinishedSetMeal)
       let content = ''
-      if (arr.f_product_type != 3) {
+      if (arr.f_product_type != 3 && arr.f_charger_type == 1) {
         content = `<h4 style="line-height: 40px;">${arr.f_sum}元${arr.f_minute}分钟正在充电,是否停止充电。</h4>`
-      } else if (arr.f_product_type == 3) {
+      } else if (arr.f_product_type == 3 && arr.f_charger_type == 1) {
         content = `<h4 style="line-height: 40px;">充满自停正在充电,是否停止充电。</h4>`
+      } else if (arr.f_charger_type == 2) {
+        content = `<h4 style="line-height: 40px;">充电正在进行,是否停止充电。</h4>`
       }
       this.$vux.confirm.show({
         content: content,
         // 组件除show外的属性
-        onCancel : () => {
-          // console.log(this) //当前 vm
-        },
+        onCancel : () => {},
         onConfirm : () => {
           this.$vux.loading.show({text: '正在结束'})
+          // console.log(id)
           this.$http
             .get(`${this.apiHost}/Order/weixin/wxOverOrder.do?token=${this.token}&f_order_id=${id}`)
             .then(res => {
@@ -552,7 +563,8 @@ export default {
               const {state} = res.data
               if (state == true) {
                 this.$vux.toast.text('订单结束')
-                this.getNoFinishedSetMeal();
+                this.getNoFinishedSetMeal(); // 获取未完成的充电套餐
+                this.handleState(); // 重新获取插座信息
               } else {
                 this.$vux.toast.text(res.data.error)
               }
@@ -567,20 +579,11 @@ export default {
       this.$http
         .get(`${this.apiHost}Order/weixin/wxFindOrderInProcess.do?token=${this.token}`)
         .then(res => {
-          // console.log(res)
-          const {total, rows} = res.data
-          this.noFinishedSetMeal = rows
+          console.log(res);
+          const {total, rows} = res.data;
+          this.noFinishedSetMeal = rows;
           if (total) return this.noFinishedSetMealShow = true;
           if (!total && this.noFinishedSetMealShow) return this.noFinishedSetMealShow = false;
-          // let str = ''
-          // rows.forEach(item => {
-          //   if (item.f_product_type == 1) {
-          //     str += `${item.f_sum}元${item.f_minute}分钟正在充电　`
-          //   }
-          //   else if (item.f_product_type == 3){
-          //     str += '充满自停正在充电　'
-          //   }
-          // })
         })
     },
     // 获取设备插座  信号
@@ -588,7 +591,7 @@ export default {
       this.$http
         .get(`${this.apiHost}charger/weixin/findChargerState.do?token=${this.token}&f_sn_num=${this.sn_num}`)
         .then(res => {
-          // console.log(1,res)
+          // console.log(1,res.data.charger.pointers)
           const {f_pointer_free_count, f_signal, pointers, f_state, f_charger_type} = res.data.charger
           this.f_charger_type = f_charger_type
           this.state = f_state;
@@ -674,7 +677,6 @@ export default {
         this.formData.f_product_id = -1
         if (this.confirmList.length == 1) {
           this.confirmListitem(0);
-          this.affirmcharge();
         } else {
           this.show = true;
         }
@@ -692,7 +694,11 @@ export default {
             } else {
               setTimeout(() => {
                 // this.toastShow = true
-                this.setMealExplain = true
+                if (this.f_charger_type == 1) {
+                  this.setMealExplain = true // 电车桩弹出充电信息
+                } else {
+                  this.toastShow = true; // 汽车桩不弹
+                }
               }, 600)
             }
           } else {
@@ -704,15 +710,19 @@ export default {
     },
     // 开始充电
     affirm () {
+      this.$vux.loading.show({text: '正在通信，请稍后。'})
       this.$http.get(this.apiHost + `charger/weixin/startCharge.do?token=${this.token}&f_sn_num=${this.formData.f_sn_num}&f_product_id=${this.formData.f_product_id}&f_pointer_order=${this.formData.f_pointer_order}`)
         .then(res => {
+          console.log(res)
           const {state} = res.data
           if (state == true) {
+            this.$vux.loading.hide()
             this.showPositionValue = true;
             this.massage = '充电已开始'
-
             this.getNoFinishedSetMeal() // 未结束的订单
+            this.handleState()          // 获取插座信息
           } else {
+            this.$vux.loading.hide()
             const {error} = res.data
             this.showPositionValue = true
             this.massage = error
@@ -1021,5 +1031,10 @@ div.state .full-stop {
 /deep/ .weui-dialog__bd {
   padding-left: 10px;
   padding-right: 10px;
+}
+.testCon /deep/ .weui-dialog__bd{
+  height: 400px;
+  overflow: auto;
+  text-align: left;
 }
 </style>

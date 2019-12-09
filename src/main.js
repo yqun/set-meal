@@ -7,7 +7,13 @@ import router from './router'
 // import HttpTool from './pulign/axios'
 import global from './static/global'
 // 自定义全局组件
-import commAdmin from '@/component/commAdmin'
+import commAdmin from '@/component/commAdmin';
+// 引入easyui组件
+import 'vx-easyui/dist/themes/default/easyui.css';
+import 'vx-easyui/dist/themes/icon.css';
+import 'vx-easyui/dist/themes/vue.css';
+import EasyUi from 'vx-easyui';
+Vue.use(EasyUi)
 
 // 全局组件
 import { Swiper, SwiperItem } from 'vux'
@@ -30,6 +36,7 @@ import { XTable } from 'vux'
 import { Loading } from 'vux'
 import { Datetime } from 'vux'
 import { XTextarea } from 'vux'
+import { CheckIcon } from 'vux'
 import  { ToastPlugin } from 'vux'
 import  { ConfirmPlugin } from 'vux'
 import  { LoadingPlugin } from 'vux'
@@ -73,6 +80,7 @@ Vue.component('x-table', XTable)
 Vue.component('loading', Loading)
 Vue.component('datetime', Datetime)
 Vue.component('x-textarea', XTextarea)
+Vue.component('check-icon', CheckIcon)
 Vue.use(ToastPlugin)
 Vue.use(ConfirmPlugin)
 Vue.use(LoadingPlugin)

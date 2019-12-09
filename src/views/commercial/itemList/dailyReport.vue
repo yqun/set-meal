@@ -1,17 +1,22 @@
 <template>
-  <div class="comm-body">
+  <div class="comm-body" :style="commBodyStyle">
     <!-- 返回导航 -->
     <comm-admin go="itemList"></comm-admin>
     <!-- 下拉框 -->
     <group :gutter="15">
-      <selector title="全部"
-                direction="ltr"
-                :options="list"
-                :value-map="['id', 'f_name']"
-                v-model="defaultValue"
-                @on-change="getdefaultValueSite()"
-                placeholder="请选择站点">
-      </selector>
+      <x-input title="全部" placeholder="请选择站点"
+               v-model="defaultValue"
+               @click.native="siteShow=true"
+               disabled text-align="right">
+      </x-input>
+      <!--<selector title="全部"-->
+                <!--direction="ltr"-->
+                <!--:options="list"-->
+                <!--:value-map="['id', 'f_name']"-->
+                <!--v-model="defaultValue"-->
+                <!--@on-change="getdefaultValueSite()"-->
+                <!--placeholder="请选择站点">-->
+      <!--</selector>-->
     </group>
     <div>
       <div class="clearfix totalSum">
@@ -56,6 +61,17 @@
       <x-button @click.native="onScrollBottom()" v-if="pagesize <= ratio && pagesizeAll <= ratio">点击加载更多</x-button>
       <!--<x-button v-else-if="pagesize > ratio || pagesizeAll > ratio"></x-button>-->
     </div>
+    <!-- 选择站点弹框 -->
+    <confirm v-model="siteShow" class="testCon" title="请选择站点" @on-confirm="getdefaultValueSite()">
+      <Tree :data="siteData"
+            ref="easyTree"
+            @nodeExpand="onNodeExpand($event)"
+            @nodeClick="nodeClick">
+      </Tree>
+      <p style="position: absolute;bottom: 50px;">
+        <check-icon :value.sync="cascade" size="14">是否级联选择</check-icon>
+      </p>
+    </confirm>
   </div>
 </template>
 
@@ -65,6 +81,11 @@ export default {
   name: "dailyReport",
   data() {
     return {
+      siteShow: false,
+      selection: {},
+      siteData:[],
+      cascade: false, // 是否级联
+
       tableConfig: false,
       list: [], // 所有站点
       defaultValue: '', // 选择的站点id
@@ -75,14 +96,64 @@ export default {
       f_kwh: 0,
       dayinfo: [], // 日报信息
       ratio: 0, // 判断 数据是否还有
+      commBodyStyle: {overflow: 'auto'}
+    }
+  },
+  watch: {
+    siteShow(newVal, oldVal) {
+      if (newVal) {
+        this.commBodyStyle.overflow = 'hidden';
+      } else {
+        this.commBodyStyle.overflow = 'auto';
+      }
     }
   },
   created() {
-    this.judgeToken()
-    this.getAllSite()
-    this.getSiteInfo()
+    this.judgeToken();
+    // this.getAllSite();
+    this.getSiteInfo();
+    this.getSiteNameAll();
   },
   methods: {
+    getSiteNameAll() {
+      this.$http
+        .get(`${this.apiHost}leagueBuss/findScopeByPageTree.do?token=${this.token}`)
+        .then(res => {
+          this.siteData = res.data
+        })
+    },
+    onNodeExpand(event) {
+      let node = event;
+      if (!node.children) {
+        this.getNodes(node).then(data => {
+          this.$set(node, "children", data);
+        });
+      }
+    },
+    async getNodes(node) {
+      if (!node.state) return false;
+      const res = await this.$http.get(`${this.apiHost}leagueBuss/findScopeByPageTree.do?token=${this.token}&id=${node.id}`)
+      const data = res.data;
+      // console.log(data);
+      return new Promise(resolve => {
+        if (!node) return false;
+        resolve(data);
+        // 异步获取数据
+        // setTimeout(() => {
+        //   if (node.id == 1) {
+        //     resolve(document);
+        //   } else if (node.id == 12) {
+        //     resolve(programs);
+        //   }
+        // }, 1000);
+      });
+    },
+    nodeClick(node) {
+      this.selection = node;
+      if (!node.state) return false; // this.$refs.easyTree.selectNode()
+      node.state=='closed'?node.state='open':node.state='closed';
+      this.onNodeExpand(node)
+    },
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
@@ -122,13 +193,16 @@ export default {
     },
     // 选择站点  清空渲染的数据
     getdefaultValueSite() {
-      this.dayinfo = []
-      this.pagesize = 1
-      this.pagesizeAll = 1
+      console.log(this.selection)
+      const {id, rid, type, text} = this.selection;
+      this.defaultValue = text;
+
+      this.dayinfo = [];
+      this.pagesize = 1;
+      this.pagesizeAll = 1;
       this.$http
-        .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&f_chargeStation_id=${this.defaultValue}&page=${this.pagesize}&rows=10`)
+        .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&id=${rid}&type=${type}&cascade=${this.cascade}&page=${this.pagesize}&rows=10`)
         .then(res => {
-          // console.log(res)
           const {rows, total,f_order_count,f_sum, f_kwh} = res.data
           this.f_order_count = f_order_count*1
           this.f_sum = (f_sum*1).toFixed(2)
@@ -148,8 +222,9 @@ export default {
     },
     // 根据 选择的站点id 点击分页 获取 站点信息
     getPageSite() {
+      const {id, rid, type, text} = this.selection;
       this.$http
-        .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&f_chargeStation_id=${this.defaultValue}&page=${this.pagesize}&rows=10`)
+        .get(`${this.apiHost}Order/weixin/wxDailyReport.do?token=${this.token}&id=${rid}&type=${type}&cascade=${this.cascade}&page=${this.pagesize}&rows=10`)
         .then(res => {
           const {rows, total} = res.data
           // 判断数据是否还有
@@ -158,7 +233,7 @@ export default {
             item.sum = (item.sum*1).toFixed(2)
             item.minute = (item.minute*1).toFixed(2)
             this.dayinfo.push(item);
-          })
+          });
           this.pagesize++
         })
     },
@@ -254,5 +329,15 @@ i.confirm::before {
 i.confirm::after {
   top: 17px;
   left: -3px;
+}
+.testCon /deep/ .weui-dialog__bd{
+  height: 400px;
+  overflow: auto;
+  text-align: left;
+  padding-bottom: 1.6em;
+}
+.testCon /deep/ .weui-dialog__bd .tree{
+  height: 100%;
+  overflow: auto;
 }
 </style>
