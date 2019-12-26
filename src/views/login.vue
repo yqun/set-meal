@@ -141,13 +141,17 @@ export default {
         this.$http
           .get(`${this.apiHost}member/weixin/authenticMember.do?token=${this.token}&f_phone_num=${this.cellPhone}&code=${this.Verification}&f_img_code=${this.picverification}`)
           .then(res => {
+            console.log(res)
             const {state} = res.data
             const toAddress = this.$route.query.to? this.$route.query.to:'personal'
+
             if (state == true) {
+              if (res.data.reload) {
+                window.sessionStorage.setItem('token', res.data.token)
+              }
               this.$router.push(`/${toAddress}`)
             } else {
-              this.toastVal = res.data.error
-              this.showToast = true
+              this.$vux.toast.text(res.data.error)
             }
           })
       }//end if
@@ -164,6 +168,8 @@ export default {
 }
 .content {
   position: absolute;
+  left: 0;
+  right: 0;
   box-sizing: border-box;
   padding: 0 20px;
 }

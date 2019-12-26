@@ -131,7 +131,7 @@
           </button-tab-item>
           <button-tab-item class="mealchoose-item"
                            @on-item-click="getActivebtn(index)"
-                           style="height: 38px;line-height: 38px;"
+                           style="line-height: 38px;"
                            v-if="item.f_product_type == 3"
                            v-for="(item,index) in chooseCost"
                            :key="item.id">
@@ -155,7 +155,7 @@
             </button-tab-item>
             <button-tab-item class="mealchoose-item"
                              @on-item-click="getActivebtn(index)"
-                             style="height: 38px;line-height: 38px;"
+                             style="line-height: 38px;"
                              v-if="item.f_product_type == 3"
                              v-for="(item,index) in chooseCost"
                              :key="item.id">
@@ -311,6 +311,7 @@ export default {
     return {
       openId: 0,
       token: '',
+      client: '', //判断微信还是支付宝
       // swiper pic
       list: [],
       swiperHeight: 0.5,
@@ -364,20 +365,28 @@ export default {
   created () {
     this.judgeToken();
     this.handleToken();
+    this.getWeiXinUser();
   },
   methods: {
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
+      this.client = window.sessionStorage.getItem('client');
     },
     // 获取token
     async handleToken() {
       // 判断 是扫码进来的主页  还是通过跳转进来的
-      this.openId = this.$route.query.openId
-      this.random = this.$route.query.f_random_num
+      this.openId = this.$route.query.openId;
+      this.random = this.$route.query.f_random_num;
+      window.sessionStorage.setItem('f_random_num', this.random?this.random:'')
       const res = await this.$http.get(`${this.apiHost}member/getToken.do?openId=${this.openId}`);
-      // console.log(res)
+      console.log(res);
       const {data} = res;
+      if (!this.client) {
+        window.sessionStorage.setItem('client', data.client);
+        this.client = data.client;
+      }
+
       if (data.f_subscribe == 0) {
         this.publicNumberShow = true
       }
@@ -387,6 +396,7 @@ export default {
         // 把token设置在sessionStorage中
         window.sessionStorage.setItem('token', data.token);
       }
+
       this.getf_sn_num()
       this.handleAdver() // 获取banner图片
       this.getImages() // 主页充电桩图片
@@ -452,57 +462,53 @@ export default {
           }
         })
     },
-    // 调用微信扫一扫
-    againscan() {
+    // 获取微信配置
+    getWeiXinUser() {
       this.$http.get(`${this.apiHost}/weChatPay/weixin/getJsApiConfig.do?token=${this.token}`)
         .then(res => {
-          const {appId, timeStamp, nonceStr, signature} = res.data
-          const that = this
+          // console.log(res.data.signature)
+          const {appId, timeStamp, nonceStr, signature} = res.data;
           wx.config({
             // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
             debug: false,
-            // 必填，公众号的唯一标识
-            appId: appId,
-            // 必填，生成签名的时间戳
-            timestamp: ""+timeStamp,
-            // 必填，生成签名的随机串
-            nonceStr: nonceStr,
-            // 必填，签名
-            signature: signature,
-            // 必填，需要使用的JS接口列表
-            jsApiList : [ 'scanQRCode' ]
-          })
+            appId: appId,// 必填，公众号的唯一标识
+            timestamp: ""+timeStamp, // 必填，生成签名的时间戳
+            nonceStr: nonceStr, // 必填，生成签名的随机串
+            signature: signature, // 必填，签名
+            jsApiList : [ 'scanQRCode', "chooseWXPay" ] // 必填，需要使用的JS接口列表
+          });
           // 配置失败  返回失败信息
           wx.error(function(res){
-            // alert('配置失败')
             // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
             // for (let key in res) {
             //   alert(res[key])
             // }
           });
-          // 调用 微信扫一扫接口
-          wx.scanQRCode({
-            needResult : 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-            scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
-            success : function(res) {
-              const str = 'f_random_num'
-              if(res.resultStr.indexOf(str) == -1) {
-                alert('请扫描插座上的二维码')
-              } else {
-                // alert('获取随机数成功' + res.resultStr.split('=')[1])
-                that.random = res.resultStr.split('=')[1]
-                that.$router.push({
-                  path: '/home',
-                  query: {
-                    f_random: res.resultStr.split('=')[1],
-                    openId: that.openId
-                  }
-                })
-                that.getf_sn_num()
-              }
-            }
-          });
         })
+    },
+    // 调用微信扫一扫
+    againscan() {
+      const that = this
+      if (this.client == 'ali') {
+        ap.scan(function(res){
+          // ap.alert(res.code);
+          if (res.code.indexOf('f_random_num') == -1) return alert('请扫描插座上的二维码');
+          that.random = res.code.split('=')[1];
+          that.$router.push({path: '/home', query: {f_random: that.random, openId: that.openId}});
+        });
+      } else {
+        // 调用 微信扫一扫接口
+        wx.scanQRCode({
+          needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+          scanType: ["qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
+          success: function (res) {
+            if (res.resultStr.indexOf('f_random_num') == -1) return alert('请扫描插座上的二维码');
+            that.random = res.resultStr.split('=')[1];
+            that.$router.push({path: '/home', query: {f_random: that.random, openId: that.openId}});
+          }
+        });
+      }
+      this.getf_sn_num()
     },
     // banner 轮播
     handleAdver() {
@@ -732,50 +738,73 @@ export default {
     // 调用微信支付接口充钱
     addmonery () {
       if (this.formData.f_product_id == -1) return this.$router.push('recharge');
-      // 跳转地址
-      this.$http.get(this.apiHost + `weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.formData.f_product_id}`)
-        .then(res => {
-          this.orderId = res.data.orderId
-          const that = this;
-          wx.config({
-            debug: false,
-            appId: res.data.appId,
-            timestamp: res.data.timeStamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature,
-            jsApiList: ["chooseWXPay"]
-          });
-          this.$vux.confirm.show({
-            title: '充值说明',
-            content: '充值费用只限于充电，不能退回!',
-            showCancelButton: false,
-            // 组件除show外的属性
-            onConfirm : () => {
-              wx.chooseWXPay({
-                timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
-                package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
-                signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                paySign: res.data.paySign, // 支付签名
-                success: function (res) {
-                  // 支付成功后的回调函数
-                  // if (res.errMsg == "chooseWXPay:ok") {
-                  //   alert("支付成功！");
-                  // } else {
-                  //   alert("支付失败" + res.errMsg);
-                  // }
-                },
-                fail: function (res) {
-                  that.$http.get(that.apiHost + `weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+      // 支付宝
+      if (this.client == 'ali') {
+        const _this = this;
+        this.$vux.confirm.show({
+          title: '充值说明',
+          content: '充值费用只限于充电，不能退回!',
+          showCancelButton: false,
+          // 组件除show外的属性
+          onConfirm : () => {
+            _this.$http.get(`${_this.apiHost}weChatPay/aLiPayMent.do?token=${_this.token}&f_product_id=${this.formData.f_product_id}&f_random_num=${this.random}`)
+              .then(res => {
+                const {state, content} = res.data;
+                if (state) {
+                  this.$router.push({
+                    path: '/aliPay',
+                    query: {form: content}
+                  });
                 }
-              });
-            }
-          })
+              })
+          }
+        });
+      } else {
+        // 跳转地址
+        this.$http.get(this.apiHost + `weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.formData.f_product_id}`)
+          .then(res => {
+            this.orderId = res.data.orderId
+            const that = this;
+            wx.config({
+              debug: false,
+              appId: res.data.appId,
+              timestamp: res.data.timeStamp,
+              nonceStr: res.data.nonceStr,
+              signature: res.data.signature,
+              jsApiList: ["chooseWXPay", "scanQRCode"]
+            });
+            this.$vux.confirm.show({
+              title: '充值说明',
+              content: '充值费用只限于充电，不能退回!',
+              showCancelButton: false,
+              // 组件除show外的属性
+              onConfirm: () => {
+                wx.chooseWXPay({
+                  timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                  nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
+                  package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+                  signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                  paySign: res.data.paySign, // 支付签名
+                  success: function (res) {
+                    // 支付成功后的回调函数
+                    // if (res.errMsg == "chooseWXPay:ok") {
+                    //   alert("支付成功！");
+                    // } else {
+                    //   alert("支付失败" + res.errMsg);
+                    // }
+                  },
+                  fail: function (res) {
+                    that.$http.get(that.apiHost + `weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+                  }
+                });
+              }
+            })
 
-        })
-        .catch(err => {
-          alert(err)
-        })
+          })
+          .catch(err => {
+            alert(err)
+          })
+      }
     },
   }
 }

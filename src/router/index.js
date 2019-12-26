@@ -7,6 +7,7 @@ import Expense from '@/views/personal/expense'    // 消费记录
 import Enshrine from '@/views/personal/enshrine'  // 我的收藏
 import Nearby from '@/views/personal/nearby'  // 附近设备
 import Recharge from '@/views/personal/recharge'  // 充值中心
+import AliPay from '@/views/personal/aliPay'  // 阿里支付
 import Rechargeorder from '@/views/personal/rechargeorder'  // 充值记录
 import Bankcard from '@/views/personal/bankcard'  // 我的卡包
 import Employ from '@/views/personal/employ' // 正在使用
@@ -37,6 +38,7 @@ const router = new Router({
     {path: '/enshrine',     name: 'enshrine',     component: Enshrine},
     {path: '/nearby',       name: 'nearby',       component: Nearby},
     {path: '/recharge',     name: 'recharge',     component: Recharge},
+    {path: '/aliPay',       name: 'aliPay',       component: AliPay},
     {path: '/rechargeorder',name: 'rechargeorder',component: Rechargeorder},
     {path: '/bankcard',     name: 'bankcard',     component: Bankcard},
     {path: '/employ',       name: 'employ',       component: Employ},

@@ -52,6 +52,7 @@ export default {
   data() {
     return {
       token: '',
+      client: '',
       saoma1: ' ',
       saoma2: ' ',
       defaultValue: '',
@@ -70,6 +71,7 @@ export default {
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
+      this.client = window.sessionStorage.getItem('client');
     },
     // 获取所有站点名称
     getAllSite() {
@@ -119,7 +121,7 @@ export default {
             signature: signature,
             // 必填，需要使用的JS接口列表
             jsApiList : [ 'scanQRCode' ]
-          })
+          });
           // 配置失败  返回失败信息
           wx.error(function(res){
             // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
@@ -132,27 +134,41 @@ export default {
     // 请扫描设备通讯卡上的二维码
     facility () {
       const that = this
-      // 调用 微信扫一扫接口
-      wx.scanQRCode({
-        needResult : 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-        scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
-        success : function(res) {
-          const str = res.resultStr
-          that.saoma1 = str
-        }
-      });
+      if (this.client == 'ali') {
+        // this.aliQyCode(this.saoma1)
+        ap.scan(function(res){
+          that.saoma1 = res.code
+        });
+      } else {
+        // 调用 微信扫一扫接口
+        wx.scanQRCode({
+          needResult : 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+          scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
+          success : function(res) {
+            const str = res.resultStr;
+            that.saoma1 = str
+          }
+        });
+      }
     },
     // 请扫描随机纸质二维码
     machine () {
-      const that = this
-      wx.scanQRCode({
-        needResult : 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-        scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
-        success : function(res) {
-          const str = res.resultStr.split('=')[1]
-          that.saoma2 = str
-        }
-      });
+      const that = this;
+      if (this.client == 'ali') {
+        ap.scan(function(res){
+          that.saoma2 = res.code
+        });
+      } else {
+        wx.scanQRCode({
+          needResult : 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+          scanType : [ "qrCode"], // 可以指定扫二维码还是一维码，默认二者都有
+          success : function(res) {
+            const str = res.resultStr.split('=')[1]
+            that.saoma2 = str
+          }
+        });
+      }
+
     },
     // 点击提交
     submitSiteInfo() {
@@ -208,7 +224,7 @@ export default {
             this.toastMsg = error
           }
         })
-    }
+    },
   }
 }
 </script>

@@ -6,7 +6,7 @@
       <ul>
         <li>
           <i class="iconfont icon-28"></i>
-          <p>{{balance}}</p>
+          <!--<p>{{balance}}</p>-->
         </li>
         <li @click="$router.push('/dailyReport')">
           <i class="iconfont icon-ribao"></i>
@@ -16,7 +16,8 @@
           <i class="iconfont icon-yuebao"></i>
           <p>月报</p>
         </li>
-        <li @click="getMoney()">
+        
+        <li style="background-color: #efefef;"><!-- @click="getMoney()" -->
           <i class="iconfont icon-tixian"></i>
           <p>提现</p>
         </li>

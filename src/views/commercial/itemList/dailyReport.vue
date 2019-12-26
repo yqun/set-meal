@@ -69,7 +69,7 @@
             @nodeClick="nodeClick">
       </Tree>
       <p style="position: absolute;bottom: 50px;">
-        <check-icon :value.sync="cascade" size="14">是否级联选择</check-icon>
+        <check-icon :value.sync="cascade" size="14">是否级联查询</check-icon>
       </p>
     </confirm>
   </div>

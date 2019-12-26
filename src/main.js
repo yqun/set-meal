@@ -37,6 +37,7 @@ import { Loading } from 'vux'
 import { Datetime } from 'vux'
 import { XTextarea } from 'vux'
 import { CheckIcon } from 'vux'
+import { Popup } from 'vux'
 import  { ToastPlugin } from 'vux'
 import  { ConfirmPlugin } from 'vux'
 import  { LoadingPlugin } from 'vux'
@@ -81,6 +82,7 @@ Vue.component('loading', Loading)
 Vue.component('datetime', Datetime)
 Vue.component('x-textarea', XTextarea)
 Vue.component('check-icon', CheckIcon)
+Vue.component('popup', Popup)
 Vue.use(ToastPlugin)
 Vue.use(ConfirmPlugin)
 Vue.use(LoadingPlugin)

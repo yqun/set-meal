@@ -6,8 +6,8 @@
         <x-icon type="ios-arrow-left" size="29" fill="#fff" style="vertical-align: bottom"></x-icon>返回
       </span>
       <div class="user_header">
-        <img :src="url" v-if="this.url != '0'">
-        <i class="iconfont icon-morentouxiang" v-else-if="this.url == '0'"></i>
+        <img :src="url" v-if="this.url">
+        <i class="iconfont icon-morentouxiang" v-else></i>
       </div>
       <div>
         {{userInfo.f_phone_num}}
@@ -68,6 +68,7 @@ export default {
   },
   data () {
     return {
+      client: '',
       token: '',
       openId: '',
       f_random_num: '',
@@ -87,6 +88,7 @@ export default {
     }
   },
   created() {
+    this.client = window.sessionStorage.getItem('client');
     this.handleToken();
   },
   methods: {
@@ -147,10 +149,15 @@ export default {
           this.charger = charger
           member.f_remain_sum = member.f_remain_sum.toFixed(2)
           this.userInfo = member
-          if (member.f_head_portrait == '') {
-            this.url = '0'
-          } else {
+          // if (member.f_head_portrait == '' ) {
+          //   this.url = '0'
+          // } else {
+          //   this.url = member.f_head_portrait
+          // }
+          if (this.client == 'wx') {
             this.url = member.f_head_portrait
+          } else if (this.client == 'ali'){
+            this.url = member.f_ali_head
           }
         })
     },

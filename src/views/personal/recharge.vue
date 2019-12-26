@@ -40,11 +40,16 @@
 </template>
 
 <script>
+import {TransferDom} from 'vux';
 export default {
   name: "recharge",
+  directives: {
+    TransferDom
+  },
   data () {
     return {
       token: '',
+      client: '', //判断是支付宝还是微信
       swiperHeight: 0.5,
       userInfo: '',
       // tabButton
@@ -53,6 +58,8 @@ export default {
       toastShow: false,
       toastMsg: '',
       f_product_id: '',
+      isAliPay: false,
+      aliPayForm: '',
     }
   },
   created() {
@@ -64,6 +71,7 @@ export default {
     // 判断token
     judgeToken() {
       this.token = window.sessionStorage.getItem('token');
+      this.client = window.sessionStorage.getItem('client');
     },
     // 获取用户信息
     getUserInfo() {
@@ -90,60 +98,86 @@ export default {
     },
     // 立即充值
     nowrecharge() {
-      this.f_product_id = this.rechargelist[this.index].id
+      this.f_product_id = this.rechargelist[this.index].id;
+      let random = window.sessionStorage.getItem('f_random_num');
+      console.log(random)
       // console.log(this.f_product_id)
-      // 跳转地址
-      this.$http.get(`${this.apiHost}weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.f_product_id}`)
-        .then(res => {
-          this.orderId = res.data.orderId
-          const that = this;
-          // 充值说明：充值费用只限于充电，不能退回!
-
-          wx.config({
-            debug: false,
-            appId: res.data.appId,
-            timestamp: res.data.timeStamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature,
-            jsApiList: ["chooseWXPay"]
-          });
-          this.$vux.confirm.show({
-            title: '充值说明',
-            content: '充值费用只限于充电，不能退回!',
-            showCancelButton: false,
-            // 组件除show外的属性
-            onConfirm : () => {
-              wx.chooseWXPay({
-                timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
-                package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
-                signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                paySign: res.data.paySign, // 支付签名
-                success: function (res) {
-                  // 支付成功后的回调函数
-                  this.getUserInfo()
-                  // if (res.errMsg == "chooseWXPay:ok") {
-                  //   alert("支付成功！");
-                  // } else {
-                  //   alert("支付失败" + res.errMsg);
-                  // }
-                },
-                fail: function (res) {
-                  that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
-                },
-                cancel: function (res) {
-                  //支付取消
-                  alert('支付取消');
-                  that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+      if (this.client == 'ali') {
+        const _this = this;
+        this.$vux.confirm.show({
+          title: '充值说明',
+          content: '充值费用只限于充电，不能退回!',
+          showCancelButton: false,
+          // 组件除show外的属性
+          onConfirm : () => {
+            _this.$http.get(`${_this.apiHost}weChatPay/aLiPayMent.do?token=${_this.token}&f_product_id=${this.f_product_id}&f_random_num=${random}`)
+              .then(res => {
+                // console.log(res);
+                const {state, content} = res.data
+                if (state) {
+                  this.$router.push({
+                    path: '/aliPay',
+                    query: {form: content}
+                  });
                 }
-              });
-            }
-          })
+              })
+          }
+        })
+      } else {
 
-        })
-        .catch(err => {
-          alert(err)
-        })
+        // 跳转地址 微信支付
+        this.$http.get(`${this.apiHost}weChatPay/generateOrder.do?token=${this.token}&f_product_id=${this.f_product_id}`)
+          .then(res => {
+            this.orderId = res.data.orderId;
+            const that = this;
+            // 充值说明：充值费用只限于充电，不能退回!
+
+            wx.config({
+              debug: false,
+              appId: res.data.appId,
+              timestamp: res.data.timeStamp,
+              nonceStr: res.data.nonceStr,
+              signature: res.data.signature,
+              jsApiList: ["chooseWXPay"]
+            });
+            this.$vux.confirm.show({
+              title: '充值说明',
+              content: '充值费用只限于充电，不能退回!',
+              showCancelButton: false,
+              // 组件除show外的属性
+              onConfirm : () => {
+                wx.chooseWXPay({
+                  timestamp: res.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                  nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
+                  package: res.data.package1, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+                  signType: 'MD5', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                  paySign: res.data.paySign, // 支付签名
+                  success: function (res) {
+                    // 支付成功后的回调函数
+                    this.getUserInfo()
+                    // if (res.errMsg == "chooseWXPay:ok") {
+                    //   alert("支付成功！");
+                    // } else {
+                    //   alert("支付失败" + res.errMsg);
+                    // }
+                  },
+                  fail: function (res) {
+                    that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+                  },
+                  cancel: function (res) {
+                    //支付取消
+                    alert('支付取消');
+                    that.$http.get(`${that.apiHost}weChatPay/delOrderById.do?token=${that.token}&orderId=${that.orderId}`)
+                  }
+                });
+              }
+            })
+
+          })
+          .catch(err => {
+            alert(err)
+          })
+      }
     }
   }
 }
@@ -256,5 +290,9 @@ h3:before {
 .mealchoose-item strong {
   font-size: 18px;
   font-weight: 400;
+}
+.popup0 {
+  height: 400px;
+  width: 100%;
 }
 </style>
